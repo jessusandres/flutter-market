@@ -3,6 +3,7 @@ import 'package:flutter_html/html_parser.dart';
 import 'package:flutter_html/style.dart';
 import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/models/product_model.dart';
+import 'package:gustolact/src/providers/home_provider.dart';
 import 'package:gustolact/src/providers/product_provider.dart';
 import 'package:gustolact/src/themes/light_color.dart';
 import 'package:gustolact/src/themes/theme.dart';
@@ -48,17 +49,21 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          _icon(
-            Icons.arrow_back_ios,
-            color: Colors.black54,
-            size: 15,
-            padding: 12,
-            isOutLine: true,
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          Text(storeName),
+//          SizedBox(width: 1,),
+//          Container(
+//            margin: EdgeInsets.only(left: 26),
+//            child: _icon(
+//              Icons.arrow_back_ios,
+//              color: Colors.black54,
+//              size: 15,
+//              padding: 12,
+//              isOutLine: true,
+//              onPressed: () {
+//                Navigator.of(context).pop();
+//              },
+//            ),
+//          ),
+          Text(storeName, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),),
           _icon(isLiked ? Icons.favorite : Icons.favorite_border,
               color: isLiked ? LightColor.red : LightColor.lightGrey,
               size: 15,
@@ -258,10 +263,14 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   @override
   Widget build(BuildContext context) {
     ProductProvider productProvider = Provider.of<ProductProvider>(context);
+
+
     ProductModel product = ModalRoute.of(context).settings.arguments;
+
 
     productProvider.getProductImages(product.codi);
     productProvider.getRelatedProducts(product.codi);
+
 
     return Scaffold(
       floatingActionButton: ButtonFll(),
@@ -291,19 +300,24 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       ),
     );
   }
+
+
 }
 
 class ButtonFll extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+
     return FloatingActionButton(
       onPressed: () {
+
         final snackBar = SnackBar(
           content: Text('Producto agregado!'),
           action: SnackBarAction(
             label: 'Ocultar',
             onPressed: () {
               // Some code to undo the change.
+
             },
           ),
         );

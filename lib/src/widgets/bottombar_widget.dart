@@ -146,7 +146,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
     final height = 60.0;
     MainProvider mainProvider = Provider.of<MainProvider>(context);
 
-    return Container(
+    return ( mainProvider.drawerPage == 0 ) ?
+    Container(
+      color: Colors.white,
       width: appSize.width,
       height: 60,
       child: Stack(
@@ -175,6 +177,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
           ),
         ],
       ),
-    );
+    )
+    : Container(width: 0.0,height: 0.0,);
   }
 }

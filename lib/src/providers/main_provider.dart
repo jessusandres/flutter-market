@@ -19,6 +19,21 @@ class MainProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  int _currentDrawerPage = 0;
+
+  int get drawerPage => this._currentDrawerPage;
+
+  set drawerPage(int index) {
+    this._currentDrawerPage = index;
+    notifyListeners();
+  }
+
+  List<Widget> drawerPages = [
+    CategoriePage(),
+    UnavaiablePage(),
+  ];
+
+
   List<Widget> pages = [
     HomeNavigator(),
     SearchPage(),

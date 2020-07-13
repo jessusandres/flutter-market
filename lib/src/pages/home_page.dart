@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:gustolact/src/providers/home_provider.dart';
 
@@ -17,8 +18,9 @@ class _MainPageState extends State<HomePage> {
       initialIndex: homeProvider.currentTabIndex,
       length: homeProvider.shorcuts.length,
       child: Scaffold(
-        appBar: AppBarHome(height: 55.5),
+        appBar: AppBarHome(height: 65.5),
         body: TabBarView(
+          physics: BouncingScrollPhysics(),
           children: homeProvider.shorcuts.map((shr) => shr.tabpage).toList(),
         ),
       ),
@@ -36,14 +38,18 @@ class AppBarHome extends StatelessWidget implements PreferredSizeWidget {
     HomeProvider homeProvider = Provider.of<HomeProvider>(context);
 
     return AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
+        elevation: 10,
+        backgroundColor: AppTheme.nearlyWhite,
         bottom: TabBar(
+          labelColor: Colors.deepOrange,
+          unselectedLabelColor: AppTheme.darkerText,
           tabs: homeProvider.shorcuts.map((shr) =>
               Tab(
                 child: Container(
                     padding: EdgeInsets.only(bottom: 16),
-                    child: Icon(shr.icon, color: Colors.black12,)),
+//                    child: Icon(shr.icon, color: Colors.grey,)),
+                    child: Text(shr.name ),
+                )
               )
           ).toList(),
         )

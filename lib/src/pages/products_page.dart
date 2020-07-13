@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/models/product_model.dart';
+import 'package:gustolact/src/providers/home_provider.dart';
 import 'package:gustolact/src/providers/product_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +15,7 @@ class _HomeIndexPageState extends State<HomeProductsPage> with AutomaticKeepAliv
 
     final orientation = MediaQuery.of(context).orientation;
     final ProductProvider productProvider = Provider.of<ProductProvider>(context);
+    HomeProvider homeProvider = Provider.of<HomeProvider>(context);
 
     return (productProvider.loading) ? Container(child: Center(child: CircularProgressIndicator(),),) :
     RefreshIndicator(
