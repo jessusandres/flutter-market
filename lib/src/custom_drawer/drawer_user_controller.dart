@@ -1,9 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/custom_drawer/home_drawer.dart';
-import 'package:gustolact/src/providers/home_provider.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
-import 'package:provider/provider.dart';
 
 class DrawerUserController extends StatefulWidget {
   const DrawerUserController({

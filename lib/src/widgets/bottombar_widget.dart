@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/providers/main_provider.dart';
 import 'package:gustolact/src/themes/light_color.dart';
@@ -61,12 +60,17 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
   }
 
   Widget _icon(IconData icon, bool isEnable, int index, MainProvider mainProvider) {
+
+    if(isEnable) {
+      _handlePressed(mainProvider.indexPage);
+    }
+
     return Expanded(
       child: InkWell(
         borderRadius: BorderRadius.all(Radius.circular(50)),
         onTap: () {
           mainProvider.indexPage = index;
-          _handlePressed(index);
+          _handlePressed(mainProvider.indexPage);
         },
         child: AnimatedContainer(
           duration: Duration(milliseconds: 500),
@@ -168,10 +172,10 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                _icon(Icons.home, _selectedIndex == 0, 0, mainProvider),
-                _icon(Icons.search, _selectedIndex == 1, 1, mainProvider),
-                _icon(Icons.card_travel, _selectedIndex == 2, 2, mainProvider),
-                _icon(Icons.favorite_border, _selectedIndex == 3, 3, mainProvider),
+                _icon(Icons.home, mainProvider.indexPage == 0, 0, mainProvider),
+                _icon(Icons.search, mainProvider.indexPage == 1, 1, mainProvider),
+                _icon(Icons.message, mainProvider.indexPage == 2, 2, mainProvider),
+                _icon(Icons.shopping_cart, mainProvider.indexPage == 3, 3, mainProvider),
               ],
             ),
           ),

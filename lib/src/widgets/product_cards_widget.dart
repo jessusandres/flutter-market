@@ -54,7 +54,7 @@ class ProductCards extends StatelessWidget {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(13),
                             child: FadeInImage(
-                              placeholder: AssetImage('assets/img/loading.gif'),
+                              placeholder: AssetImage('assets/gif/loading.gif'),
                               image: NetworkImage(images[index].getImage()),
                               fit: BoxFit.contain,
                             ),

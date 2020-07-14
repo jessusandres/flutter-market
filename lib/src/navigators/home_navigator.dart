@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/config/config.dart';
-import 'package:gustolact/src/pages/drawer_pages/cotizations_page.dart';
-import 'package:gustolact/src/pages/drawer_pages/profile_page.dart';
-import 'package:gustolact/src/pages/drawer_pages/settings_page.dart';
 import 'package:gustolact/src/pages/home_page.dart';
 import 'package:gustolact/src/pages/product_detail_page.dart';
 import 'package:gustolact/src/pages/unavaliable_page.dart';
 import 'package:gustolact/src/providers/main_provider.dart';
-import 'package:gustolact/src/themes/app_theme.dart';
-import 'package:gustolact/src/widgets/menu_widget.dart';
+import 'package:gustolact/src/widgets/appbar_widget.dart';
+import 'package:gustolact/src/widgets/drawer_widget.dart';
 import 'package:provider/provider.dart';
 
 class HomeNavigator extends StatefulWidget {
@@ -16,7 +13,7 @@ class HomeNavigator extends StatefulWidget {
   _HomeNavigatorState createState() => _HomeNavigatorState();
 }
 
-class _HomeNavigatorState extends State<HomeNavigator> {
+class _HomeNavigatorState extends State<HomeNavigator> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     MainProvider mainProvider = Provider.of<MainProvider>(context);
@@ -28,60 +25,14 @@ class _HomeNavigatorState extends State<HomeNavigator> {
             builder: (BuildContext context) {
               switch (settings.name) {
                 case '/':
-                  return Container(
-                      child: Scaffold(
-                        drawer: MenuWidget(),
-                        appBar: AppBar(
-                          centerTitle: true,
-                          backgroundColor: Colors.deepOrangeAccent,
-                          title: Text(storeName),
-                        ),
-                        body: HomePage(),
-                      ));
+                  return HomePage();
                 case '/product_detail':
                   return ProductDetailPage();
-                case 'profile':
-                  return Container(
-                      child: Scaffold(
-                        drawer: MenuWidget(),
-                        appBar: AppBar(
-                          centerTitle: true,
-                          backgroundColor: Colors.deepOrangeAccent,
-                          title: Text(storeName),
-                        ),
-                        body: ProfilePage(),
-                  ));
-                case 'cotizations':
-                  return Container(
-                      child: Scaffold(
-                        drawer: MenuWidget(),
-                        appBar: AppBar(
-                          centerTitle: true,
-                          backgroundColor: Colors.deepOrangeAccent,
-                          title: Text(storeName),
-                        ),
-                        body: CotizationsPage(),
-                  ));
-                case 'settings':
-                  return Container(
-                      child: Scaffold(
-                        drawer: MenuWidget(),
-                        appBar: AppBar(
-                          centerTitle: true,
-                          backgroundColor: Colors.deepOrangeAccent,
-                          title: Text(storeName),
-                        ),
-                        body: SettingsPage(),
-                  ));
                 default:
                   return Container(
                       child: Scaffold(
-                        drawer: MenuWidget(),
-                        appBar: AppBar(
-                          centerTitle: true,
-                          backgroundColor: Colors.deepOrangeAccent,
-                          title: Text(storeName),
-                        ),
+                        drawer: DrawerMarket(),
+                        appBar: AppBarMarket(),
                         body: UnavaiablePage(),
                   ));
               }
@@ -89,6 +40,10 @@ class _HomeNavigatorState extends State<HomeNavigator> {
       },
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
 
 class Books1 extends StatelessWidget {

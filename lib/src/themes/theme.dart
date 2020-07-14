@@ -10,7 +10,7 @@ class AppTheme {
 //      primaryColor: LightColor.background,
       primaryColor: Colors.deepOrange,
       cardTheme: CardTheme(color: LightColor.background),
-      textTheme: TextTheme(display1: TextStyle(color: LightColor.black)),
+      textTheme: TextTheme(headline4: TextStyle(color: LightColor.black)),
       iconTheme: IconThemeData(color: LightColor.iconColor),
       indicatorColor: Colors.deepOrange,
       accentColor: Colors.deepOrange,

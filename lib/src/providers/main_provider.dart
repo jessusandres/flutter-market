@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/navigators/home_navigator.dart';
-import 'package:gustolact/src/pages/categories_page.dart';
 import 'package:gustolact/src/pages/search_page.dart';
 import 'package:gustolact/src/pages/unavaliable_page.dart';
 
@@ -28,16 +27,10 @@ class MainProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  List<Widget> drawerPages = [
-    CategoriePage(),
-    UnavaiablePage(),
-  ];
-
-
   List<Widget> pages = [
     HomeNavigator(),
     SearchPage(),
-    CategoriePage(),
+    UnavaiablePage(),
     UnavaiablePage(),
   ];
 }

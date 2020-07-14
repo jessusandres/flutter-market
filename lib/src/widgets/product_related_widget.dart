@@ -73,7 +73,7 @@ class _Card extends StatelessWidget {
               borderRadius: BorderRadius.circular(15.0),
               child: FadeInImage(
                 image: NetworkImage(image.getImage()),
-                placeholder: AssetImage('assets/img/loading.gif'),
+                placeholder: AssetImage('assets/gif/loading.gif'),
                 height: screenSize.height * 0.22,
                 width: screenSize.width * 0.25,
                 fit: BoxFit.cover,

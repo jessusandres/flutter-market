@@ -3,7 +3,6 @@ import 'package:flutter_html/html_parser.dart';
 import 'package:flutter_html/style.dart';
 import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/models/product_model.dart';
-import 'package:gustolact/src/providers/home_provider.dart';
 import 'package:gustolact/src/providers/product_provider.dart';
 import 'package:gustolact/src/themes/light_color.dart';
 import 'package:gustolact/src/themes/theme.dart';
@@ -42,41 +41,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   }
 
   bool isLiked = true;
-
-  Widget _appBar() {
-    return Container(
-      padding: AppTheme.padding,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-//          SizedBox(width: 1,),
-//          Container(
-//            margin: EdgeInsets.only(left: 26),
-//            child: _icon(
-//              Icons.arrow_back_ios,
-//              color: Colors.black54,
-//              size: 15,
-//              padding: 12,
-//              isOutLine: true,
-//              onPressed: () {
-//                Navigator.of(context).pop();
-//              },
-//            ),
-//          ),
-          Text(storeName, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),),
-          _icon(isLiked ? Icons.favorite : Icons.favorite_border,
-              color: isLiked ? LightColor.red : LightColor.lightGrey,
-              size: 15,
-              padding: 12,
-              isOutLine: false, onPressed: () {
-            setState(() {
-              isLiked = !isLiked;
-            });
-          }),
-        ],
-      ),
-    );
-  }
 
   Widget _icon(
     IconData icon, {
@@ -142,7 +106,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     );
   }
 
-  Widget _detailWidget(ProductModel product) {
+  Widget _detailWidget(ProductModel product, MediaQueryData media) {
     return DraggableScrollableSheet(
       maxChildSize: .8,
       initialChildSize: .53,
@@ -176,12 +140,12 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                 ),
                 SizedBox(height: 10),
                 Container(
-                  child: Row(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Container(
-                        width: 150,
+                        width: double.infinity,
                         child: Text(
                           product.name,
                           style: TextStyle(
@@ -223,7 +187,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                     ],
                   ),
                 ),
-                _description(product),
+                _description(product, media),
                 SizedBox(
                   height: 15,
                 ),
@@ -236,27 +200,34 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     );
   }
 
-  Widget _description(ProductModel product) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        SizedBox(height: 15),
-        Text(
-          "Descripción",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-        ),
-        SizedBox(height: 8),
-        Container(
-          child: HtmlParser(
-            htmlData: product.description,
-            shrinkWrap: true,
-            style: {
-              "div": Style(fontSize: FontSize.xxLarge),
-              "p": Style(fontSize: FontSize.xxLarge),
-            },
+  Widget _description(ProductModel product, MediaQueryData media) {
+
+    return Container(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          SizedBox(height: 15),
+          FittedBox(
+            child: Text(
+              "Descripción",
+              style: TextStyle(fontSize: media.textScaleFactor * 25, fontWeight: FontWeight.w500),
+            ),
           ),
-        )
-      ],
+          SizedBox(height: 8),
+          Container(
+            child: HtmlParser(
+              htmlData: product.description,
+              shrinkWrap: true,
+              style: {
+                "p": Style(fontSize: FontSize.percent((media.textScaleFactor * 130).toInt()), textAlign: TextAlign.justify),
+                "div": Style(fontSize: FontSize.percent((media.textScaleFactor * 130).toInt()), textAlign: TextAlign.justify),
+                "strong": Style(fontSize: FontSize.percent((media.textScaleFactor * 100).toInt()), textAlign: TextAlign.justify),
+              },
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -264,13 +235,12 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   Widget build(BuildContext context) {
     ProductProvider productProvider = Provider.of<ProductProvider>(context);
 
-
     ProductModel product = ModalRoute.of(context).settings.arguments;
-
 
     productProvider.getProductImages(product.codi);
     productProvider.getRelatedProducts(product.codi);
 
+    MediaQueryData media = MediaQuery.of(context);
 
     return Scaffold(
       floatingActionButton: ButtonFll(),
@@ -289,11 +259,11 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  _appBar(),
+//                  _appBar(),
                   _productImage(product),
                 ],
               ),
-              _detailWidget(product)
+              _detailWidget(product, media)
             ],
           ),
         ),

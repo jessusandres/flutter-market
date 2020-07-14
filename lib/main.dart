@@ -5,6 +5,8 @@ import 'package:gustolact/src/pages/main_page.dart';
 import 'package:gustolact/src/providers/home_provider.dart';
 import 'package:gustolact/src/providers/main_provider.dart';
 import 'package:gustolact/src/providers/product_provider.dart';
+import 'package:gustolact/src/providers/search_provider.dart';
+import 'package:gustolact/src/routes/main_routes.dart';
 import 'package:gustolact/src/themes/theme.dart';
 import 'package:provider/provider.dart';
 
@@ -20,6 +22,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider( create: (_)=> new MainProvider(), ),
         ChangeNotifierProvider( create: (_)=> new HomeProvider(), ),
         ChangeNotifierProvider( create: (_)=> new ProductProvider(), ),
+        ChangeNotifierProvider( create: (_)=> new SearchProvider()),
       ],
       child: MaterialApp(
         theme: AppTheme.lightTheme.copyWith(
@@ -29,7 +32,8 @@ class MyApp extends StatelessWidget {
         ),
         debugShowCheckedModeBanner: false,
         title: '$storeName APP',
-        home: MainPage(),
+        routes: mainRoutes,
+        initialRoute: '/',
       ),
     );
   }

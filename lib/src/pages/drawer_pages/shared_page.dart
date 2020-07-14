@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:gustolact/src/widgets/appbar_widget.dart';
 import 'package:gustolact/src/widgets/drawer_widget.dart';
 
-class CotizationsPage extends StatelessWidget {
+class SharedPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: DrawerMarket(),
       appBar: AppBarMarket(),
+      drawer: DrawerMarket(),
       body: Center(
-        child: Text('CotizationsPage'),
+        child: Text('Shared Page'),
       ),
     );
   }

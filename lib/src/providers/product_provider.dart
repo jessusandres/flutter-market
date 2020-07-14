@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:convert';
 
@@ -77,22 +76,17 @@ class ProductProvider with ChangeNotifier {
   Map<String, List<ImageModel>> get productRelated => this._productRelated;
 
 
-
-
-
   //FUNCTIONS
 
-  Future<bool>getAllProducts() async {
+  Future<List<ProductModel>>getAllProducts() async {
 
-    if (products.length > 0) return true ;
+    if (products.length > 0) return this.products ;
 
     return await this.refreshProducts();
 
   }
 
   getProductImages(String code) async {
-
-    print("images of ${productImages[code].length}");
 
     if (productImages[code].length > 0) {
       return;
@@ -111,7 +105,7 @@ class ProductProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> refreshProducts() async{
+  Future<List<ProductModel>> refreshProducts() async{
 
     loading = true;
 
@@ -120,7 +114,7 @@ class ProductProvider with ChangeNotifier {
     final response = await http.get(url);
     final productsRes = jsonDecode(response.body);
 
-    final encoded = jsonEncode(productsRes['results']);
+    final encoded = jsonEncode(productsRes['data']);
     this.products = productModelFromJson(encoded);
 
     this.products.forEach((element) {
@@ -130,13 +124,12 @@ class ProductProvider with ChangeNotifier {
 
     loading = false;
 
-    return true;
+    return this.products;
   }
 
   getRelatedProducts(String codi) async{
 
     if(this.productRelated[codi].length > 0 ) {
-
       return;
     }
 
@@ -144,12 +137,14 @@ class ProductProvider with ChangeNotifier {
     final url = '$_url/store/$urlStore/related/$codi?auth=$_token';
     final response = await http.get(url);
     final productsRel = jsonDecode(response.body);
-    print(productsRel);
+
+    print("responserelated: $productsRel");
 
     final encoded = jsonEncode(productsRel['related']);
     List<ImageModel> images = imageModelFromJson(encoded);
     this.productRelated[codi].addAll(images);
     loading = false;
+
   }
 
 

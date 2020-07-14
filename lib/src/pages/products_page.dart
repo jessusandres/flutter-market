@@ -64,7 +64,7 @@ class _HomeIndexPageState extends State<HomeProductsPage> with AutomaticKeepAliv
                   child: FadeInImage(
                     fadeInDuration: Duration(milliseconds: 50),
                     width: double.infinity,
-                    placeholder: AssetImage('assets/img/loading.gif'),
+                    placeholder: AssetImage('assets/gif/loading.gif'),
                     image: NetworkImage(product.getImage()),
                     fit: BoxFit.cover,
                     height: 100.0,

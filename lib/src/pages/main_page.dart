@@ -1,11 +1,13 @@
 import 'dart:async';
-import 'package:animated_size_and_fade/animated_size_and_fade.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gustolact/src/custom_drawer/drawer_user_controller.dart';
+import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/custom_drawer/home_drawer.dart';
+import 'package:gustolact/src/navigators/home_navigator.dart';
 import 'package:gustolact/src/pages/unavaliable_page.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
+import 'package:gustolact/src/widgets/appbar_widget.dart';
+import 'package:gustolact/src/widgets/drawer_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:gustolact/src/providers/main_provider.dart';
 import 'package:gustolact/src/providers/product_provider.dart';
@@ -17,21 +19,33 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
+class _MainPageState extends State<MainPage>  with AutomaticKeepAliveClientMixin {
   int _selectedIndex = 0;
 
   List<GlobalKey<NavigatorState>> _navigatorKeys;
 
   Timer mtimer;
 
+  MainProvider mainProvider;
+
   Future<bool> _systemBackButtonPressed() {
+
     if (_navigatorKeys[_selectedIndex].currentState.canPop()) {
+
       _navigatorKeys[_selectedIndex]
           .currentState
           .pop(_navigatorKeys[_selectedIndex].currentContext);
     } else {
-      SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop');
+
+
+      if(mainProvider.indexPage == 0) {
+        SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop');
+      }else {
+        mainProvider.indexPage = 0;
+      }
+
     }
+
   }
 
   DrawerIndex drawerIndex;
@@ -40,18 +54,18 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   @override
   void initState() {
     drawerIndex = DrawerIndex.HOME;
-    screenView = MyHomePage();
+    screenView = HomeNavigator();
     super.initState();
   }
 
   @override
-  Widget build(BuildContext context) {
-    MainProvider mainProvider = Provider.of<MainProvider>(context);
+  Widget build(BuildContext context)
+  {
+    mainProvider = Provider.of<MainProvider>(context);
     ProductProvider productProvider = Provider.of<ProductProvider>(context);
 
     this._navigatorKeys = [
       mainProvider.homeNavigatorKey,
-//      _coffeeNavigatorKey,
     ];
 
     return AnimatedSwitcher(
@@ -79,8 +93,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                   child: Scaffold(
                     backgroundColor: AppTheme.nearlyWhite,
                     body: WillPopScope(
-                      onWillPop: _systemBackButtonPressed,
+                      onWillPop: (_systemBackButtonPressed),
                       child: Scaffold(
+                        drawer: DrawerMarket(),
+                        appBar: AppBarMarket(),
                         bottomNavigationBar: CustomBottomNavigationBar(),
                         body: SafeArea(
                           top: false,
@@ -94,47 +110,18 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                   ),
                 ),
               )
-//      WillPopScope(
-//        onWillPop: _systemBackButtonPressed,
-//        child: Scaffold(
-//          bottomNavigationBar: CustomBottomNavigationBar(),
-//          body: SafeArea(
-//            top: false,
-//            child: FadeIndexedStack(
-//              index: mainProvider.indexPage,
-//              children: mainProvider.pages,
-//            ),
-//          ),
-//        ),
-//      ),
         );
 
-    if ((productProvider.mainLoading)) {
-      return _mcontainer(productProvider.mainLoading);
-    } else {
-      return _mcontainer(productProvider.mainLoading);
-      return WillPopScope(
-        onWillPop: _systemBackButtonPressed,
-        child: Scaffold(
-          bottomNavigationBar: CustomBottomNavigationBar(),
-          body: SafeArea(
-            top: false,
-            child: FadeIndexedStack(
-              index: mainProvider.indexPage,
-              children: mainProvider.pages,
-            ),
-          ),
-        ),
-      );
-    }
+
   }
 
   void changeIndex(DrawerIndex drawerIndexdata) {
+
     if (drawerIndex != drawerIndexdata) {
       drawerIndex = drawerIndexdata;
       if (drawerIndex == DrawerIndex.HOME) {
         setState(() {
-          screenView = MyHomePage();
+          screenView = HomeNavigator();
         });
       } else if (drawerIndex == DrawerIndex.Help) {
         setState(() {
@@ -149,102 +136,31 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           screenView = UnavaiablePage();
         });
       } else {
-        //do in your way......
+        setState(() {
+          screenView = UnavaiablePage();
+        });
       }
     }
+
   }
 
   Widget _mcontainer(bool loading) {
+
     return Scaffold(
       body: Container(
         color: Colors.white,
         child: Container(
           child: Center(
             child: Image(
-              image: AssetImage('assets/img/progress.gif'),
+              image: AssetImage('assets/gif/progress.gif'),
             ),
           ),
         ),
       ),
     );
   }
-}
 
-class CoffeeNavigator extends StatefulWidget {
   @override
-  _CoffeeNavigatorState createState() => _CoffeeNavigatorState();
-}
+  bool get wantKeepAlive => true;
 
-GlobalKey<NavigatorState> _coffeeNavigatorKey = GlobalKey<NavigatorState>();
-
-class MyHomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    MainProvider mainProvider = Provider.of<MainProvider>(context);
-    return WillPopScope(
-      onWillPop: () {},
-//      onWillPop: _systemBackButtonPressed,
-      child: Scaffold(
-        bottomNavigationBar: CustomBottomNavigationBar(),
-        body: SafeArea(
-          top: false,
-          child: FadeIndexedStack(
-            index: mainProvider.indexPage,
-            children: mainProvider.pages,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CoffeeNavigatorState extends State<CoffeeNavigator> {
-  @override
-  Widget build(BuildContext context) {
-    return Navigator(
-      key: _coffeeNavigatorKey,
-      onGenerateRoute: (RouteSettings settings) {
-        return MaterialPageRoute(
-            settings: settings,
-            builder: (BuildContext context) {
-              switch (settings.name) {
-                case '/':
-                  return Coffee1();
-                case '/coffee2':
-                  return Coffee2();
-              }
-            });
-      },
-    );
-  }
-}
-
-class Coffee1 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        AppBar(
-          title: Text("Coffee 1"),
-        ),
-        FlatButton(
-          child: Text("Go to coffee 2"),
-          onPressed: () => Navigator.pushNamed(context, '/coffee2'),
-        ),
-      ],
-    );
-  }
-}
-
-class Coffee2 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        AppBar(
-          title: Text("Coffee 2"),
-        ),
-      ],
-    );
-  }
 }

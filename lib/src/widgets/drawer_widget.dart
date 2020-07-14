@@ -3,7 +3,7 @@ import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/providers/main_provider.dart';
 import 'package:provider/provider.dart';
 
-class MenuWidget extends StatelessWidget {
+class DrawerMarket extends StatelessWidget {
   @override
   Drawer build(BuildContext context) {
     MainProvider mainProvider = Provider.of<MainProvider>(context);
@@ -14,9 +14,12 @@ class MenuWidget extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: <Widget>[
             Container(
+              height: 210,
               width: double.infinity,
-              child: Image(
+              child: FadeInImage(
+                placeholder: AssetImage('assets/gif/spinner.gif'),
                 image: NetworkImage(storeAvatar),
+                fit: BoxFit.cover,
               ),
             ),
             Divider(),
@@ -37,7 +40,7 @@ class MenuWidget extends StatelessWidget {
             ),
             ListTile(
               leading: Icon(
-                Icons.person,
+                Icons.account_circle,
                 color: ( mainProvider.drawerPage == 1) ?  Theme.of(context).primaryColor : Colors.black26,
               ),
               title: Text('Perfil',
@@ -52,10 +55,10 @@ class MenuWidget extends StatelessWidget {
             ),
             ListTile(
               leading: Icon(
-                Icons.party_mode,
+                Icons.assessment,
                 color: ( mainProvider.drawerPage == 2) ?  Theme.of(context).primaryColor : Colors.black26,
               ),
-              title: Text('Cotizaciones',
+              title: Text('Mis Pedidos',
                 style: TextStyle(
                   color: ( mainProvider.drawerPage == 2) ?  Theme.of(context).primaryColor : Colors.black26,
                   fontWeight: ( mainProvider.drawerPage == 2) ? FontWeight.w700 : FontWeight.normal,
@@ -67,10 +70,10 @@ class MenuWidget extends StatelessWidget {
             ),
             ListTile(
               leading: Icon(
-                Icons.settings,
+                Icons.share,
                 color: ( mainProvider.drawerPage == 3) ?  Theme.of(context).primaryColor : Colors.black26,
               ),
-              title: Text('Ajustes',
+              title: Text('Compartir',
                 style: TextStyle(
                   color: ( mainProvider.drawerPage == 3) ?  Theme.of(context).primaryColor : Colors.black26,
                   fontWeight: ( mainProvider.drawerPage == 3) ? FontWeight.w700 : FontWeight.normal,
