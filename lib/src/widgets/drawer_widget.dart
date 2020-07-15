@@ -34,6 +34,8 @@ class DrawerMarket extends StatelessWidget {
                   fontWeight: ( mainProvider.drawerPage == 0) ? FontWeight.w700 : FontWeight.normal,
                 ),),
               onTap: () {
+
+                if(mainProvider.drawerPage == 0) return;
                 mainProvider.drawerPage = 0;
                 Navigator.pushReplacementNamed(context, '/');
               },
@@ -49,6 +51,7 @@ class DrawerMarket extends StatelessWidget {
                   fontWeight: ( mainProvider.drawerPage == 1) ? FontWeight.w700 : FontWeight.normal,
                 ),),
               onTap: () {
+                if(mainProvider.drawerPage == 1) return;
                 mainProvider.drawerPage = 1;
                 Navigator.pushReplacementNamed(context, 'profile');
               },
@@ -64,6 +67,7 @@ class DrawerMarket extends StatelessWidget {
                   fontWeight: ( mainProvider.drawerPage == 2) ? FontWeight.w700 : FontWeight.normal,
                 ),),
               onTap: () {
+                if(mainProvider.drawerPage == 2) return;
                 mainProvider.drawerPage = 2;
                 Navigator.pushReplacementNamed(context, 'cotizations');
               },
@@ -79,6 +83,7 @@ class DrawerMarket extends StatelessWidget {
                   fontWeight: ( mainProvider.drawerPage == 3) ? FontWeight.w700 : FontWeight.normal,
                 ),),
               onTap: () {
+                if(mainProvider.drawerPage == 3) return;
                 mainProvider.drawerPage = 3;
                 Navigator.pushReplacementNamed(context, 'settings');
               },

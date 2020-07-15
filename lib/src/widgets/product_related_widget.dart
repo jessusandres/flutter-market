@@ -25,12 +25,16 @@ class ProductRelatedCards extends StatelessWidget {
     List<ImageModel> images = productProvider.productRelated[product.codi];
 
     if (images.length == 0) {
-      return Container(
-        height: screenSize.height * 0.4,
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      if(productProvider.nullRelatedList[product.codi]) {
+        return SizedBox( height: 10, );
+      }else {
+        return Container(
+          height: screenSize.height * 0.4,
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      }
     } else {
       return Container(
         height: screenSize.height * 0.30,

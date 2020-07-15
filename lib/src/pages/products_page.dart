@@ -9,35 +9,41 @@ class HomeProductsPage extends StatefulWidget {
   _HomeIndexPageState createState() => _HomeIndexPageState();
 }
 
-class _HomeIndexPageState extends State<HomeProductsPage> with AutomaticKeepAliveClientMixin  {
+class _HomeIndexPageState extends State<HomeProductsPage>
+    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
-
     final orientation = MediaQuery.of(context).orientation;
-    final ProductProvider productProvider = Provider.of<ProductProvider>(context);
+    final ProductProvider productProvider =
+        Provider.of<ProductProvider>(context);
     HomeProvider homeProvider = Provider.of<HomeProvider>(context);
 
-    return (productProvider.loading) ? Container(child: Center(child: CircularProgressIndicator(),),) :
-    RefreshIndicator(
-      onRefresh: productProvider.refreshProducts,
-      child: GridView.count(
-          physics: BouncingScrollPhysics(),
-          childAspectRatio: (orientation == Orientation.landscape) ? 1.3 : 1,
-          primary: false,
-          padding: const EdgeInsets.all(20),
-          crossAxisSpacing: 20,
-          mainAxisSpacing: 26,
-          crossAxisCount: (orientation == Orientation.landscape) ? 3 : 2,
-          children: _storeCards(context, productProvider.products)),
-    );
+    return (productProvider.loading)
+        ? Container(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
+        : RefreshIndicator(
+            onRefresh: productProvider.refreshProducts,
+            child: GridView.count(
+                physics: BouncingScrollPhysics(),
+                childAspectRatio:
+                    (orientation == Orientation.landscape) ? 1.3 : 1,
+                primary: false,
+                padding: const EdgeInsets.all(20),
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 26,
+                crossAxisCount: (orientation == Orientation.landscape) ? 3 : 2,
+                children: _storeCards(context, productProvider.products)),
+          );
   }
 
   List<Widget> _storeCards(BuildContext context, List<ProductModel> products) {
-
     List<Widget> storeCards = new List();
 
     products.forEach((product) {
-      product.uniqueId = product.codi + 'hm';
+      product.uniqueId = product.codi + 'home';
       final container = Container(
           padding: EdgeInsets.all(6.0),
           width: 100,
@@ -49,8 +55,7 @@ class _HomeIndexPageState extends State<HomeProductsPage> with AutomaticKeepAliv
                     color: Colors.black45,
                     blurRadius: 15,
                     offset: Offset(2.0, 12.0),
-                    spreadRadius: 0.01
-                )
+                    spreadRadius: 0.01)
               ]),
 //          padding: const EdgeInsets.all(8),
           child: Column(
@@ -74,26 +79,24 @@ class _HomeIndexPageState extends State<HomeProductsPage> with AutomaticKeepAliv
               SizedBox(
                 height: 12,
               ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 5.3),
-                child: Center(
+              Expanded(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 5.3),
                     child: Text(
-                      product.getName(),
-                      overflow: TextOverflow.fade,
+                      product.name,
                       style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                       textAlign: TextAlign.center,
-                    )),
+                    ),
+                  )
               ),
             ],
-          )
-      );
-
+          ));
 
       storeCards.add(GestureDetector(
         child: container,
         onTap: () {
 //          Navigator.of(context).pushNamed('productDetail', arguments:  product );
-          Navigator.pushNamed(context, '/product_detail',arguments:  product );
+          Navigator.pushNamed(context, '/product_detail', arguments: product);
         },
       ));
     });

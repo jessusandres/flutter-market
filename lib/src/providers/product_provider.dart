@@ -9,11 +9,6 @@ import 'package:gustolact/src/models/image_model.dart';
 
 class ProductProvider with ChangeNotifier {
 
-  final _token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYW5kcmV3IiwicGFzcyI6ImJsbW9udDEwIiwiaWQiOjIwMjAwM30.WwgI6w5rWu5yXdxuKFsPWhA-4pAl1XoyHVHcKVvjZZ8';
-  final _url = 'https://tuquepides.com/api';
-
-
   bool _loading = true;
   bool get loading => this._loading;
 
@@ -75,6 +70,9 @@ class ProductProvider with ChangeNotifier {
   Map<String, List<ImageModel>> _productRelated = {};
   Map<String, List<ImageModel>> get productRelated => this._productRelated;
 
+  Map<String, bool> _nullRelatedList = {};
+  Map<String, bool> get nullRelatedList => this._nullRelatedList;
+
 
   //FUNCTIONS
 
@@ -92,12 +90,11 @@ class ProductProvider with ChangeNotifier {
       return;
     } else {
 
-      final url = '$_url/store/$urlStore/images/$code?auth=$_token';
+      final url = '$storeUrlAPI/images/$code?auth=$globalToken';
       final response = await http.get(url);
       final jsnresponse = jsonDecode(response.body);
       final encoded = jsonEncode(jsnresponse['results']);
       List<ImageModel> images = imageModelFromJson(encoded);
-
 
       this._productImages[code].addAll(images);
       notifyListeners();
@@ -109,7 +106,7 @@ class ProductProvider with ChangeNotifier {
 
     loading = true;
 
-    final url = '$_url/store/$urlStore/products?auth=$_token';
+    final url = '$storeUrlAPI/products?auth=$globalToken';
 
     final response = await http.get(url);
     final productsRes = jsonDecode(response.body);
@@ -120,6 +117,7 @@ class ProductProvider with ChangeNotifier {
     this.products.forEach((element) {
       this.productImages[element.codi] = new List();
       this.productRelated[element.codi] = new List();
+      this.nullRelatedList[element.codi] = false;
     });
 
     loading = false;
@@ -129,16 +127,21 @@ class ProductProvider with ChangeNotifier {
 
   getRelatedProducts(String codi) async{
 
-    if(this.productRelated[codi].length > 0 ) {
+    if(this.productRelated[codi].length > 0 || this.nullRelatedList[codi] == true) {
       return;
     }
 
     loading = true;
-    final url = '$_url/store/$urlStore/related/$codi?auth=$_token';
-    final response = await http.get(url);
-    final productsRel = jsonDecode(response.body);
 
-    print("responserelated: $productsRel");
+    final url = '$storeUrlAPI/related/$codi?auth=$globalToken';
+    final response = await http.get(url);
+    Map<String, dynamic> productsRel = jsonDecode(response.body);
+
+    if(productsRel['related'].length == 0) {
+      nullRelatedList[codi] = true;
+      return [];
+    }
+
 
     final encoded = jsonEncode(productsRel['related']);
     List<ImageModel> images = imageModelFromJson(encoded);
