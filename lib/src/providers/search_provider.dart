@@ -17,7 +17,7 @@ class SearchProvider with ChangeNotifier {
 
   List<FilterModel> _sublines = [];
   get sublines => this._sublines;
-  set sublines(List<FilterModel> list){
+  set sublines(List<FilterModel> list) {
     this._sublines = list;
   }
 
@@ -64,11 +64,42 @@ class SearchProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  List<ProductModel> _filterResults = [];
 
-  List<ProductModel> filterResults = [];
+  List<ProductModel> get filterResults => this._filterResults;
+
+  set filterResults(List<ProductModel> filterResults) {
+    this._filterResults = filterResults;
+  }
+
+  int _order = 0;
+
+  int get order => this._order;
+
+  set order(int order) {
+    this._order = order;
+    notifyListeners();
+  }
+
+
+
+  reset() {
+    this.query = '';
+    this.filterResults = [];
+    notifyListeners();
+    this.order = 0;
+  }
+
+  resetFilters() {
+
+    this.lineSelected = '0';
+    this.brandSelected = '0';
+    this.subLineSelected = '0';
+    notifyListeners();
+    this.order = 0;
+  }
 
   getLines() async {
-
     if (lines.length > 0) return this.lines;
 
     final url = '$storeUrlAPI/lines?auth=$globalToken';
@@ -86,15 +117,13 @@ class SearchProvider with ChangeNotifier {
     notifyListeners();
 
     return linesRecived;
-
   }
 
   getSubLines(String line) async {
-
     if (sublines.length > 0) return this.sublines;
 
     final url = '$storeUrlAPI/$line/sublines?auth=$globalToken';
-    print(url);
+
     final response = await http.get(url);
 
     final data = jsonDecode(response.body);
@@ -103,17 +132,14 @@ class SearchProvider with ChangeNotifier {
 
     final sublinesRecived = filterModelFromJson(toParse);
 
-    print("recived: $sublinesRecived");
     this._sublines.addAll(sublinesRecived);
 
     notifyListeners();
 
     return sublinesRecived;
-
   }
 
   getBrands() async {
-
     if (brands.length > 0) return this.brands;
 
     final url = '$storeUrlAPI/brands?auth=$globalToken';
@@ -131,66 +157,81 @@ class SearchProvider with ChangeNotifier {
     notifyListeners();
 
     return brandsRecived;
-
   }
 
-  reset() {
-    this.query = '';
-    this.filterResults = [];
-    notifyListeners();
+  bool _load = false;
+  get load => this._load;
+  set load(bool val) {
+    this._load = val;
+  }
+
+  bool _showBottomButton;
+
+  bool get showBottomButton => this._showBottomButton;
+
+  set showBottomButton(bool showBottomButton) {
+    this._showBottomButton = showBottomButton;
+  }
+
+  bool _loadQuery = true;
+
+  bool get loadQuery => this._loadQuery;
+
+  set loadQuery(bool loadQuery) {
+    this._loadQuery = loadQuery;
   }
 
   Timer mtimer;
 
-  bool _load = false;
-  get load => this._load;
+  filterProducts() async {
 
-  set load(bool val) {
-    this._load   = val;
-  }
-
-  Future<List<ProductModel>> filterProducts() async{
+    this.showBottomButton = false;
 
     this.filterResults = [];
-    load = true;
 
     String itemName = 'all';
-//    print("queryo: ${this._query.trim().length}");
-    if(this._query.trim().length > 0) {
+
+    if (this._query.trim().length > 0) {
       itemName = query;
     }
-    print("query: $itemName");
-    final url = '$storeUrlAPI/search/products?line=$lineSelected&subline=$subLineSelected&brand=$brandSelected&item=$itemName&auth=$globalToken';
-    print("url: $url");
+
+
+    final url =
+        '$storeUrlAPI/search/products?line=$lineSelected&subline=$subLineSelected&brand=$brandSelected&item=$itemName&auth=$globalToken';
+
     final response = await http.get(url);
 
-    final data = jsonDecode(response.body);
-    print("data: $data");
 
-    if(data['ok'] == false) {
-      return [];
+    final data = jsonDecode(response.body);
+
+    if (data['ok'] == false) {
+      this.filterResults = [];
+      this.loadQuery = false;
+      notifyListeners();
+      return;
     }
+
 
     final toParse = jsonEncode(data['products']);
 
-
-
     final productsRecived = productModelFromJson(toParse);
 
+    if ( this.order == 1 ) {
+      productsRecived.sort((a, b) => a.webPrice.compareTo(b.webPrice));
+    }
+
+    if( this.order == 2 ) {
+      productsRecived.sort((a, b) => b.webPrice.compareTo(a.webPrice));
+    }
 
     this.filterResults.addAll(productsRecived);
 
-    load = false;
-
-    return this.filterResults;
+    this.loadQuery = false;
+    notifyListeners();
 
   }
 
-
-  searchProducts(String query, ProductProvider productProvider) async{
-
-//    if(query.trim().length <= 3) return this.filterResults;
-print("search");
+  searchProducts(String query, ProductProvider productProvider) async {
     this.filterResults = [];
 
     final allProducts = productProvider.products;
@@ -203,34 +244,30 @@ print("search");
       }
     });
 
-//    return currentSugerences;
-
     this.filterResults.addAll(currentResults);
     notifyListeners();
-//    return  this.filterResults;
-
   }
 
-  SearchProvider() {
-    print('==SEARCH PROVIDER==');
-  }
+  SearchProvider();
 
   Future<List<ProductModel>> filterByName(
-
       String query, ProductProvider productProvider) async {
-
     if (sugerences.length > 0) return sugerences;
 
     final allProducts = await productProvider.getAllProducts();
 
     List<ProductModel> currentSugerences = [];
 
-    //TODO: opcional colocar un limite
-    allProducts.forEach((element) {
+    int maximo = 10;
+    for (ProductModel element in allProducts) {
       if (element.name.toLowerCase().contains(query.toLowerCase())) {
         currentSugerences.add(element);
+        maximo--;
       }
-    });
+      if (maximo == 0) {
+        break;
+      }
+    }
 
     return currentSugerences;
   }

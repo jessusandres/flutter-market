@@ -10,26 +10,25 @@ class HomeProductsPage extends StatefulWidget {
 
 class _HomeIndexPageState extends State<HomeProductsPage>
     with AutomaticKeepAliveClientMixin {
+
   @override
   Widget build(BuildContext context) {
 
-    final ProductProvider productProvider =
+    final ProductProvider _productProvider =
         Provider.of<ProductProvider>(context);
 
 
-    return (productProvider.loading)
+    return (_productProvider.mainLoading)
         ? Container(
             child: Center(
               child: CircularProgressIndicator(),
             ),
           )
         : RefreshIndicator(
-            onRefresh: productProvider.refreshProducts,
-            child: ListProducts(products: productProvider.products,),
+            onRefresh: _productProvider.refreshProducts,
+            child: ListProducts(products: _productProvider.products,),
           );
   }
-
-
 
   @override
   bool get wantKeepAlive => true;

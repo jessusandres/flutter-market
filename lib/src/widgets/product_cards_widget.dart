@@ -16,11 +16,11 @@ class ProductCards extends StatelessWidget {
 
     final size = MediaQuery.of(context).size;
 
-    final ProductProvider productProvider = Provider.of<ProductProvider>(context);
+    final ProductProvider _productProvider = Provider.of<ProductProvider>(context);
 
-    productProvider.getProductImages(product.codi);
+    _productProvider.getProductImages(product.codi);
 
-    List<ImageModel> images = productProvider.productImages[product.codi];
+    List<ImageModel> images = _productProvider.productImages[product.codi];
 
     if (images.length == 0) {
       return Container(

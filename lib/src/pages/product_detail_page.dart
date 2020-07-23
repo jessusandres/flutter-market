@@ -4,25 +4,31 @@ import 'package:flutter_html/style.dart';
 import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/models/product_model.dart';
 import 'package:gustolact/src/providers/product_provider.dart';
+import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/themes/light_color.dart';
-import 'package:gustolact/src/themes/theme.dart';
 import 'package:gustolact/src/widgets/product_cards_widget.dart';
 import 'package:gustolact/src/widgets/product_related_widget.dart';
 import 'package:gustolact/src/widgets/title_text.dart';
-import 'package:gustolact/src/widgets/extensions.dart';
 import 'package:provider/provider.dart';
 
 class ProductDetailPage extends StatefulWidget {
-  ProductDetailPage({Key key}) : super(key: key);
+
+  final ProductModel detailProduct;
+
+  ProductDetailPage({Key key,@required this.detailProduct}) : super(key: key);
 
   @override
-  _ProductDetailPageState createState() => _ProductDetailPageState();
+  _ProductDetailPageState createState() => _ProductDetailPageState(this.detailProduct);
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage>
     with TickerProviderStateMixin {
+  final ProductModel _product;
+
   AnimationController controller;
   Animation<double> animation;
+
+  _ProductDetailPageState(this._product);
 
   @override
   void initState() {
@@ -42,41 +48,41 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   bool isLiked = true;
 
-  Widget _icon(
-    IconData icon, {
-    Color color = LightColor.iconColor,
-    double size = 20,
-    double padding = 10,
-    bool isOutLine = false,
-    Function onPressed,
-  }) {
-    return Container(
-      height: 40,
-      width: 40,
-      padding: EdgeInsets.all(padding),
-      // margin: EdgeInsets.all(padding),
-      decoration: BoxDecoration(
-        border: Border.all(
-            color: LightColor.iconColor,
-            style: isOutLine ? BorderStyle.solid : BorderStyle.none),
-        borderRadius: BorderRadius.all(Radius.circular(13)),
-        color:
-            isOutLine ? Colors.transparent : Theme.of(context).backgroundColor,
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-              color: Color(0xfff8f8f8),
-              blurRadius: 5,
-              spreadRadius: 10,
-              offset: Offset(5, 5)),
-        ],
-      ),
-      child: Icon(icon, color: color, size: size),
-    ).ripple(() {
-      if (onPressed != null) {
-        onPressed();
-      }
-    }, borderRadius: BorderRadius.all(Radius.circular(13)));
-  }
+//  Widget _icon(
+//    IconData icon, {
+//    Color color = LightColor.iconColor,
+//    double size = 20,
+//    double padding = 10,
+//    bool isOutLine = false,
+//    Function onPressed,
+//  }) {
+//    return Container(
+//      height: 40,
+//      width: 40,
+//      padding: EdgeInsets.all(padding),
+//      // margin: EdgeInsets.all(padding),
+//      decoration: BoxDecoration(
+//        border: Border.all(
+//            color: LightColor.iconColor,
+//            style: isOutLine ? BorderStyle.solid : BorderStyle.none),
+//        borderRadius: BorderRadius.all(Radius.circular(13)),
+//        color:
+//            isOutLine ? Colors.transparent : Theme.of(context).backgroundColor,
+//        boxShadow: <BoxShadow>[
+//          BoxShadow(
+//              color: Color(0xfff8f8f8),
+//              blurRadius: 5,
+//              spreadRadius: 10,
+//              offset: Offset(5, 5)),
+//        ],
+//      ),
+//      child: Icon(icon, color: color, size: size),
+//    ).ripple(() {
+//      if (onPressed != null) {
+//        onPressed();
+//      }
+//    }, borderRadius: BorderRadius.all(Radius.circular(13)));
+//  }
 
   Widget _productImage(ProductModel product) {
     return AnimatedBuilder(
@@ -201,7 +207,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   }
 
   Widget _description(ProductModel product, MediaQueryData media) {
-
     return Container(
       width: double.infinity,
       child: Column(
@@ -211,7 +216,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           FittedBox(
             child: Text(
               "Descripción",
-              style: TextStyle(fontSize: media.textScaleFactor * 25, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                  fontSize: media.textScaleFactor * 25,
+                  fontWeight: FontWeight.w500),
             ),
           ),
           SizedBox(height: 8),
@@ -220,9 +227,18 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               htmlData: product.description,
               shrinkWrap: true,
               style: {
-                "p": Style(fontSize: FontSize.percent((media.textScaleFactor * 130).toInt()), textAlign: TextAlign.justify),
-                "div": Style(fontSize: FontSize.percent((media.textScaleFactor * 130).toInt()), textAlign: TextAlign.justify),
-                "strong": Style(fontSize: FontSize.percent((media.textScaleFactor * 100).toInt()), textAlign: TextAlign.justify),
+                "p": Style(
+                    fontSize:
+                        FontSize.percent((media.textScaleFactor * 130).toInt()),
+                    textAlign: TextAlign.justify),
+                "div": Style(
+                    fontSize:
+                        FontSize.percent((media.textScaleFactor * 130).toInt()),
+                    textAlign: TextAlign.justify),
+                "strong": Style(
+                    fontSize:
+                        FontSize.percent((media.textScaleFactor * 100).toInt()),
+                    textAlign: TextAlign.justify),
               },
             ),
           )
@@ -233,12 +249,13 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    ProductProvider productProvider = Provider.of<ProductProvider>(context);
 
-    ProductModel product = ModalRoute.of(context).settings.arguments;
+    final ProductProvider _productProvider = Provider.of<ProductProvider>(context);
 
-    productProvider.getProductImages(product.codi);
-    productProvider.getRelatedProducts(product.codi);
+//    final ProductModel _product = ModalRoute.of(context).settings.arguments;
+
+    _productProvider.getProductImages(_product.codi);
+    _productProvider.getRelatedProducts(_product.codi);
 
     MediaQueryData media = MediaQuery.of(context);
 
@@ -260,43 +277,38 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               Column(
                 children: <Widget>[
 //                  _appBar(),
-                  _productImage(product),
+                  _productImage(_product),
                 ],
               ),
-              _detailWidget(product, media)
+              _detailWidget(_product, media)
             ],
           ),
         ),
       ),
     );
   }
-
-
 }
 
 class ButtonFll extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
     return FloatingActionButton(
       onPressed: () {
-
         final snackBar = SnackBar(
           content: Text('Producto agregado!'),
           action: SnackBarAction(
             label: 'Ocultar',
             onPressed: () {
               // Some code to undo the change.
-
             },
           ),
         );
 
         Scaffold.of(context).showSnackBar(snackBar);
       },
-      backgroundColor: LightColor.orange,
+      backgroundColor: AppTheme.primaryColor,
       child: Icon(Icons.add_circle,
-          color: Theme.of(context).floatingActionButtonTheme.backgroundColor),
+          color: AppTheme.white),
     );
   }
 }

@@ -1,5 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/models/product_model.dart';
+import 'package:gustolact/src/pages/product_detail_page.dart';
+import 'package:gustolact/src/tansitions/fade_transition.dart';
+
 
 class ListProducts extends StatelessWidget {
 
@@ -67,7 +71,10 @@ class ListProducts extends StatelessWidget {
         child: container,
         onTap: () {
 //          Navigator.of(context).pushNamed('productDetail', arguments:  product );
-          Navigator.pushNamed(context, '/product_detail', arguments: product);
+//          Navigator.pushNamed(context, '/product_detail', arguments: product);
+
+         Navigator.push(context, FadeRoute( page: ProductDetailPage(detailProduct: product,) ) );
+
         },
       ));
     });

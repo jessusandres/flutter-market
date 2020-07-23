@@ -13,6 +13,5 @@ final mainRoutes = {
   'profile': (BuildContext context) => ProfilePage(),
   'cotizations': (BuildContext context) => CotizationsPage(),
   'settings': (BuildContext context) => SharedPage(),
-  'product_detail': (BuildContext context) => ProductDetailPage(),
   'filter': (BuildContext context) => FilterPage(),
 };

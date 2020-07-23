@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/providers/main_provider.dart';
+import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/themes/light_color.dart';
 import 'package:gustolact/src/widgets/BottomNavigationBar/bottom_curved_Painter.dart';
 import 'package:provider/provider.dart';
@@ -80,7 +81,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
               duration: Duration(milliseconds: 300),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                  color: isEnable ? LightColor.orange : Colors.white,
+                  color: isEnable ? AppTheme.primaryColor : Colors.white,
                   boxShadow: <BoxShadow>[
                     BoxShadow(
                       color: isEnable ? Color(0xfffeece2) : Colors.white,
@@ -148,9 +149,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
 
     final appSize = MediaQuery.of(context).size;
     final height = 60.0;
-    MainProvider mainProvider = Provider.of<MainProvider>(context);
+    final MainProvider _mainProvider = Provider.of<MainProvider>(context);
 
-    return ( mainProvider.drawerPage == 0 ) ?
+    return ( _mainProvider.drawerPage == 0 ) ?
     Container(
       color: Colors.white,
       width: appSize.width,
@@ -172,10 +173,10 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                _icon(Icons.home, mainProvider.indexPage == 0, 0, mainProvider),
-                _icon(Icons.search, mainProvider.indexPage == 1, 1, mainProvider),
-                _icon(Icons.message, mainProvider.indexPage == 2, 2, mainProvider),
-                _icon(Icons.shopping_cart, mainProvider.indexPage == 3, 3, mainProvider),
+                _icon(Icons.home, _mainProvider.indexPage == 0, 0, _mainProvider),
+                _icon(Icons.search, _mainProvider.indexPage == 1, 1, _mainProvider),
+                _icon(Icons.message, _mainProvider.indexPage == 2, 2, _mainProvider),
+                _icon(Icons.shopping_cart, _mainProvider.indexPage == 3, 3, _mainProvider),
               ],
             ),
           ),

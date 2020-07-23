@@ -11,45 +11,44 @@ import 'package:gustolact/src/widgets/sugerences_list.dart';
 import 'package:provider/provider.dart';
 
 class ProductsSearch extends SearchDelegate {
-
   bool showButtom = false;
 
   @override
   List<Widget> buildActions(BuildContext context) {
-
-    SearchProvider searchProvider = Provider.of<SearchProvider>(context);
+    final SearchProvider _searchProvider = Provider.of<SearchProvider>(context);
 
     //acciones del appbar
     return [
       IconButton(
         icon: Icon(Icons.clear),
         onPressed: () {
-          if(searchProvider.query.trim().length == 0) Navigator.pop(context);
-          searchProvider.reset();
+          if (_searchProvider.query.trim().length == 0) Navigator.pop(context);
+          _searchProvider.reset();
           showButtom = false;
           query = '';
         },
       ),
-      showButtom ? IconButton(
+      IconButton(
         icon: Icon(Icons.format_list_bulleted),
-        onPressed: (){
+        onPressed: () {
           showModalBottomSheet<void>(
             context: context,
-            isScrollControlled: true,
+//            isScrollControlled: true,
             builder: (BuildContext context) {
-              return ModalBottomFilter();
+              return ModalBottomFilter(
+                searchContext: context,
+                callToShow: showResults,
+              );
             },
           );
         },
-      ) : Container(),
+      ),
     ];
   }
 
   @override
   Widget buildLeading(BuildContext context) {
-
-
-    SearchProvider searchProvider = Provider.of<SearchProvider>(context);
+    final SearchProvider _searchProvider = Provider.of<SearchProvider>(context);
     //icono de inicio(izquierda del appbar)
     return IconButton(
       icon: AnimatedIcon(
@@ -57,57 +56,40 @@ class ProductsSearch extends SearchDelegate {
         progress: transitionAnimation,
       ),
       onPressed: () {
-        searchProvider.reset();
+        _searchProvider.reset();
         query = '';
         close(context, null);
       },
     );
   }
 
-
   @override
   Widget buildResults(BuildContext context) {
 
     showButtom = true;
 
-    SearchProvider searchProvider = Provider.of<SearchProvider>(context);
-    searchProvider.query = query;
-
-
-
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: EdgeInsets.only(left: 26, top: 27),
-            child: Text('Resultados de la búsqueda: ', style: TextStyle(fontSize: FontSize.large.size, fontWeight: FontWeight.bold),),
-          ),
-          Expanded(
-              child: FilterListProducts()
-          ),
-        ]
-      ),
-    );
+    final SearchProvider _searchProvider = Provider.of<SearchProvider>(context);
+    _searchProvider.query = query;
+    return HomeSearch();
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     // sugerencias que aparecen cuando escribe
-    SearchProvider searchProvider = Provider.of<SearchProvider>(context);
-    ProductProvider productProvider = Provider.of<ProductProvider>(context);
+    final SearchProvider _searchProvider = Provider.of<SearchProvider>(context);
+    final ProductProvider _productProvider = Provider.of<ProductProvider>(context);
 
     if (query.isEmpty) {
-      searchProvider.sugerences = [];
+      _searchProvider.sugerences = [];
       return Container();
     }
 
-    if(query != searchProvider.query) {
-      searchProvider.sugerences = [];
+    if (query != _searchProvider.query) {
+      _searchProvider.sugerences = [];
     }
 
     return FutureBuilder(
-      future: searchProvider.filterByName(query, productProvider),
+      future: _searchProvider.filterByName(query, _productProvider),
       builder:
           (BuildContext context, AsyncSnapshot<List<ProductModel>> snapshot) {
         if (snapshot.hasData) {
@@ -126,4 +108,39 @@ class ProductsSearch extends SearchDelegate {
   String get searchFieldLabel => "Buscar en $storeName";
 }
 
+class HomeSearch extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Scaffold(
+      body: Column(children: <Widget>[
+        Container(
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.only(left: 26, top: 27, bottom: 20),
+          child: Text(
+            'Resultados de la búsqueda: ',
+            style: TextStyle(
+                fontSize: FontSize.large.size, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Expanded(child: FilterListProducts()),
+      ]),
+    );
+  }
+}
 
+class SearchResult extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Scaffold(
+        body: Container(
+          child: Text('results'),
+        ),
+      ),
+    );
+  }
+}

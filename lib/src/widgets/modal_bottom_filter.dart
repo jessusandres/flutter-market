@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/style.dart';
 import 'package:gustolact/src/providers/search_provider.dart';
+import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class ModalBottomFilter extends StatelessWidget {
+  final BuildContext searchContext;
+  final Function callToShow;
+
+  const ModalBottomFilter(
+      {@required this.searchContext, @required this.callToShow});
+
   @override
   Widget build(BuildContext context) {
-    SearchProvider searchProvider = Provider.of<SearchProvider>(context);
-    final size = MediaQuery.of(context).size;
+    final SearchProvider _searchProvider = Provider.of<SearchProvider>(context);
 
     return SafeArea(
       child: Container(
-        height: size.height * 0.7,
         color: Colors.white38,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -38,17 +43,15 @@ class ModalBottomFilter extends StatelessWidget {
                       alignment: Alignment.centerRight,
 //                  color: Colors.red,
                       child: FlatButton(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                        textColor: Colors.deepOrange,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
+                          textColor: Colors.deepOrange,
                           child: Text(
                             'Limpiar',
-                            style: TextStyle(fontSize: FontSize.xLarge.size - 1),
+                            style:
+                                TextStyle(fontSize: FontSize.xLarge.size - 1),
                           ),
-                          onPressed: () {
-                            searchProvider.lineSelected = '0';
-                            searchProvider.brandSelected = '0';
-                            searchProvider.subLineSelected = '0';
-                          })),
+                          onPressed: _searchProvider.resetFilters)),
                 ),
               ],
             ),
@@ -67,27 +70,49 @@ class ModalBottomFilter extends StatelessWidget {
                   width: 13,
                 ),
                 FlatButton(
+                  color: (_searchProvider.order == 1)
+                      ? AppTheme.primaryColor
+                      : Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18.0),
-                      side: BorderSide(color: Colors.deepOrangeAccent)),
+                      side: BorderSide(
+                          color: (_searchProvider.order == 1)
+                              ? Colors.white
+                              : AppTheme.primaryColor)),
                   child: Text(
                     'Menor Precio',
-                    style: TextStyle(color: Colors.deepOrangeAccent),
+                    style: TextStyle(
+                        color: (_searchProvider.order == 1)
+                            ? Colors.white
+                            : AppTheme.primaryColor),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    _searchProvider.order = 1;
+                  },
                 ),
                 SizedBox(
                   width: 25,
                 ),
                 FlatButton(
+                  color: (_searchProvider.order == 2)
+                      ? AppTheme.primaryColor
+                      : Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18.0),
-                      side: BorderSide(color: Colors.deepOrangeAccent)),
+                      side: BorderSide(
+                          color: (_searchProvider.order == 2)
+                              ? Colors.white
+                              : AppTheme.primaryColor)),
                   child: Text(
                     'Mayor Precio',
-                    style: TextStyle(color: Colors.deepOrangeAccent),
+                    style: TextStyle(
+                        color: (_searchProvider.order == 2)
+                            ? Colors.white
+                            : AppTheme.primaryColor),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    _searchProvider.order = 2;
+                  },
                 ),
               ],
             ),
@@ -111,7 +136,8 @@ class ModalBottomFilter extends StatelessWidget {
                 children: <Widget>[
                   ListTile(
                     onTap: () {
-                      Navigator.pushNamed(context, 'filter', arguments: 'lines');
+                      Navigator.pushNamed(context, 'filter',
+                          arguments: 'lines');
                     },
                     trailing: Icon(Icons.arrow_forward_ios),
                     title: Container(
@@ -121,12 +147,13 @@ class ModalBottomFilter extends StatelessWidget {
                             fontSize: FontSize.large.size,
                             fontWeight: FontWeight.w400),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 40, vertical: 14),
                     ),
                   ),
                   ListTile(
                     onTap: () {
-                      if (searchProvider.lineSelected == '0') {
+                      if (_searchProvider.lineSelected == '0') {
                         Alert(
                                 context: context,
                                 title: "UPS",
@@ -147,12 +174,14 @@ class ModalBottomFilter extends StatelessWidget {
                             fontSize: FontSize.large.size,
                             fontWeight: FontWeight.w400),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 40, vertical: 14),
                     ),
                   ),
                   ListTile(
                     onTap: () {
-                      Navigator.pushNamed(context, 'filter', arguments: 'brands');
+                      Navigator.pushNamed(context, 'filter',
+                          arguments: 'brands');
                       print('brand');
                     },
                     trailing: Icon(Icons.arrow_forward_ios),
@@ -163,32 +192,39 @@ class ModalBottomFilter extends StatelessWidget {
                             fontSize: FontSize.large.size,
                             fontWeight: FontWeight.w400),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 40, vertical: 14),
                     ),
                   ),
                 ],
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-              width: double.infinity,
-              child: FlatButton(
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                  textColor: Colors.white,
-                  color: Colors.deepOrangeAccent,
-                  child: Text(
-                    'Aplicar Filtros',
-                    style: TextStyle(fontSize: FontSize.xLarge.size - 1),
-                  ),
-                  onPressed: () {
-                    if (searchProvider.brandSelected.length == '0'
-                        && searchProvider.lineSelected.length == '0'
-                        && searchProvider.subLineSelected.length == '0') return;
-                    searchProvider.filterProducts();
-                    Navigator.pop(context);
-                  })
-            )
+                padding: EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                width: double.infinity,
+                child: (_searchProvider.showBottomButton)
+                    ? FlatButton(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                        textColor: Colors.white,
+                        color: AppTheme.primaryColor,
+                        child: Text(
+                          'Aplicar Filtros',
+                          style: TextStyle(fontSize: FontSize.xLarge.size - 1),
+                        ),
+                        onPressed: () {
+                          if (_searchProvider.brandSelected == '0' &&
+                              _searchProvider.lineSelected == '0' &&
+                              _searchProvider.subLineSelected == '0') {
+                            print('returned of search');
+                            return;
+
+                          }
+                          Navigator.pop(context);
+                          this.callToShow(this.searchContext);
+                        })
+                    : Container())
           ],
         ),
       ),

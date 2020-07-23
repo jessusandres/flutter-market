@@ -17,6 +17,7 @@ class _SearchPageState extends State<SearchPage> {
 
     SearchProvider searchProvider = Provider.of<SearchProvider>(context);
     searchProvider.getBrands();
+
     return Scaffold(
       body: Container(
         child: Column(
@@ -39,6 +40,7 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                   GestureDetector(
                     onTap: () {
+                      searchProvider.showBottomButton = true;
                       showSearch(context: context, delegate: ProductsSearch());
                     },
                     child: Container(

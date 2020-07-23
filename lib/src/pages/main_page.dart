@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/custom_drawer/home_drawer.dart';
 import 'package:gustolact/src/navigators/home_navigator.dart';
-import 'package:gustolact/src/pages/unavaliable_page.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/widgets/appbar_widget.dart';
 import 'package:gustolact/src/widgets/drawer_widget.dart';
@@ -26,7 +24,7 @@ class _MainPageState extends State<MainPage>  with AutomaticKeepAliveClientMixin
 
   Timer mtimer;
 
-  MainProvider mainProvider;
+  MainProvider _mainProvider;
 
   Future<bool> _systemBackButtonPressed() {
 
@@ -38,10 +36,10 @@ class _MainPageState extends State<MainPage>  with AutomaticKeepAliveClientMixin
     } else {
 
 
-      if(mainProvider.indexPage == 0) {
+      if(_mainProvider.indexPage == 0) {
         SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop');
       }else {
-        mainProvider.indexPage = 0;
+        _mainProvider.indexPage = 0;
       }
 
     }
@@ -61,20 +59,22 @@ class _MainPageState extends State<MainPage>  with AutomaticKeepAliveClientMixin
   @override
   Widget build(BuildContext context)
   {
-    mainProvider = Provider.of<MainProvider>(context);
-    ProductProvider productProvider = Provider.of<ProductProvider>(context);
+    _mainProvider = Provider.of<MainProvider>(context);
+    final ProductProvider _productProvider = Provider.of<ProductProvider>(context);
 
     this._navigatorKeys = [
-      mainProvider.homeNavigatorKey,
+      _mainProvider.homeNavigatorKey,
     ];
 
+
     return AnimatedSwitcher(
-        duration: const Duration(milliseconds: 2400),
+
+        duration: Duration(milliseconds: 2400),
         transitionBuilder: (Widget child, Animation<double> animation) {
+
           var begin = Offset(0.3, 1.0);
           var end = Offset.zero;
           var curve = Curves.ease;
-
           var tween =
               Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
@@ -83,7 +83,7 @@ class _MainPageState extends State<MainPage>  with AutomaticKeepAliveClientMixin
             child: child,
           );
         },
-        child: (productProvider.mainLoading)
+        child: (_productProvider.mainLoading)
             ? _mcontainer(true)
             : Container(
                 color: AppTheme.nearlyWhite,
@@ -101,8 +101,8 @@ class _MainPageState extends State<MainPage>  with AutomaticKeepAliveClientMixin
                         body: SafeArea(
                           top: false,
                           child: FadeIndexedStack(
-                            index: mainProvider.indexPage,
-                            children: mainProvider.pages,
+                            index: _mainProvider.indexPage,
+                            children: _mainProvider.getPages(context),
                           ),
                         ),
                       ),
@@ -115,34 +115,34 @@ class _MainPageState extends State<MainPage>  with AutomaticKeepAliveClientMixin
 
   }
 
-  void changeIndex(DrawerIndex drawerIndexdata) {
-
-    if (drawerIndex != drawerIndexdata) {
-      drawerIndex = drawerIndexdata;
-      if (drawerIndex == DrawerIndex.HOME) {
-        setState(() {
-          screenView = HomeNavigator();
-        });
-      } else if (drawerIndex == DrawerIndex.Help) {
-        setState(() {
-          screenView = UnavaiablePage();
-        });
-      } else if (drawerIndex == DrawerIndex.FeedBack) {
-        setState(() {
-          screenView = UnavaiablePage();
-        });
-      } else if (drawerIndex == DrawerIndex.Invite) {
-        setState(() {
-          screenView = UnavaiablePage();
-        });
-      } else {
-        setState(() {
-          screenView = UnavaiablePage();
-        });
-      }
-    }
-
-  }
+//  void changeIndex(DrawerIndex drawerIndexdata) {
+//
+//    if (drawerIndex != drawerIndexdata) {
+//      drawerIndex = drawerIndexdata;
+//      if (drawerIndex == DrawerIndex.HOME) {
+//        setState(() {
+//          screenView = HomeNavigator();
+//        });
+//      } else if (drawerIndex == DrawerIndex.Help) {
+//        setState(() {
+//          screenView = UnavaiablePage();
+//        });
+//      } else if (drawerIndex == DrawerIndex.FeedBack) {
+//        setState(() {
+//          screenView = UnavaiablePage();
+//        });
+//      } else if (drawerIndex == DrawerIndex.Invite) {
+//        setState(() {
+//          screenView = UnavaiablePage();
+//        });
+//      } else {
+//        setState(() {
+//          screenView = UnavaiablePage();
+//        });
+//      }
+//    }
+//
+//  }
 
   Widget _mcontainer(bool loading) {
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/models/product_model.dart';
+import 'package:gustolact/src/pages/product_detail_page.dart';
 import 'package:gustolact/src/providers/search_provider.dart';
+import 'package:gustolact/src/tansitions/scale_transition.dart';
 import 'package:provider/provider.dart';
 
 class SugerencesList extends StatelessWidget {
@@ -10,7 +12,7 @@ class SugerencesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    SearchProvider searchProvider = Provider.of<SearchProvider>(context);
+    final SearchProvider _searchProvider = Provider.of<SearchProvider>(context);
 
     return ListView(
       children: items.map((item) {
@@ -29,9 +31,11 @@ class SugerencesList extends StatelessWidget {
           subtitle: Text(item.brand),
           onTap: () {
 //                  searchProvider.query = query;
-            searchProvider.sugerences = items;
-            Navigator.pushNamed(context, 'product_detail',
-                arguments: item);
+            _searchProvider.sugerences = items;
+//            Navigator.pushNamed(context, 'product_detail',
+//                arguments: item);
+//          Navigator.push(context, ScaleRoute(page: ProductDetailPage(detailProduct: item)));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetailPage(detailProduct: item,)));
           },
         );
       }).toList(),

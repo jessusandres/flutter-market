@@ -12,7 +12,7 @@ class FilterPage extends StatefulWidget {
 class _FilterPageState extends State<FilterPage> {
   @override
   Widget build(BuildContext context) {
-    SearchProvider searchProvider = Provider.of<SearchProvider>(context);
+    final SearchProvider _searchProvider = Provider.of<SearchProvider>(context);
 
     final type = ModalRoute.of(context).settings.arguments;
 
@@ -25,25 +25,25 @@ class _FilterPageState extends State<FilterPage> {
       case 'lines':
 
         filterName = 'Lineas';
-        filterSelected = searchProvider.lineSelected;
-        searchProvider.getLines();
-        filters = searchProvider.lines;
+        filterSelected = _searchProvider.lineSelected;
+        _searchProvider.getLines();
+        filters = _searchProvider.lines;
         break;
 
       case 'sublines':
 
         filterName = 'Sub Lineas';
-        filterSelected = searchProvider.subLineSelected;
-        searchProvider.getSubLines(searchProvider.lineSelected);
-        filters = searchProvider.sublines;
+        filterSelected = _searchProvider.subLineSelected;
+        _searchProvider.getSubLines(_searchProvider.lineSelected);
+        filters = _searchProvider.sublines;
         break;
 
       default:
 
         filterName = 'Marcas';
-        filterSelected = searchProvider.brandSelected;
-        searchProvider.getBrands();
-        filters = searchProvider.brands;
+        filterSelected = _searchProvider.brandSelected;
+        _searchProvider.getBrands();
+        filters = _searchProvider.brands;
         break;
 
     }
@@ -104,15 +104,15 @@ class _FilterPageState extends State<FilterPage> {
 
                               switch (type) {
                                 case 'lines':
-                                  searchProvider.lineSelected = code;
-                                  searchProvider.subLineSelected = '0';
-                                  searchProvider.sublines = [];
+                                  _searchProvider.lineSelected = code;
+                                  _searchProvider.subLineSelected = '0';
+                                  _searchProvider.sublines = [];
                                   break;
                                 case 'sublines':
-                                  searchProvider.subLineSelected = code;
+                                  _searchProvider.subLineSelected = code;
                                   break;
                                 default:
-                                  searchProvider.brandSelected = code;
+                                  _searchProvider.brandSelected = code;
                                   break;
                               }
                             },

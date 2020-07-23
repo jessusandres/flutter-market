@@ -27,6 +27,7 @@ class ProductModel {
   int appPrice;
   double webPrice;
   String uniqueId;
+  int indexview = 0;
   String description;
 
   factory ProductModel.fromJson(Map<String, dynamic> json) => ProductModel(

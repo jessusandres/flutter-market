@@ -12,16 +12,16 @@ class _MainPageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
 
-    HomeProvider homeProvider = Provider.of<HomeProvider>(context);
+    final HomeProvider _homeProvider = Provider.of<HomeProvider>(context);
 
     return DefaultTabController(
-      initialIndex: homeProvider.currentTabIndex,
-      length: homeProvider.shorcuts.length,
+      initialIndex: _homeProvider.currentTabIndex,
+      length: _homeProvider.shorcuts.length,
       child: Scaffold(
         appBar: AppBarHome(height: 65.5),
         body: TabBarView(
           physics: BouncingScrollPhysics(),
-          children: homeProvider.shorcuts.map((shr) => shr.tabpage).toList(),
+          children: _homeProvider.shorcuts.map((shr) => shr.tabpage).toList(),
         ),
       ),
     );
@@ -35,15 +35,15 @@ class AppBarHome extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
 
-    HomeProvider homeProvider = Provider.of<HomeProvider>(context);
+    final HomeProvider _homeProvider = Provider.of<HomeProvider>(context);
 
     return AppBar(
         elevation: 10,
         backgroundColor: AppTheme.nearlyWhite,
         bottom: TabBar(
-          labelColor: Colors.deepOrange,
+          labelColor: AppTheme.primaryColor,
           unselectedLabelColor: AppTheme.darkerText,
-          tabs: homeProvider.shorcuts.map((shr) =>
+          tabs: _homeProvider.shorcuts.map((shr) =>
               Tab(
                 child: Container(
                     padding: EdgeInsets.only(bottom: 16),

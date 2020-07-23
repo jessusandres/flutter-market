@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/pages/home_page.dart';
 import 'package:gustolact/src/pages/product_detail_page.dart';
 import 'package:gustolact/src/pages/unavaliable_page.dart';
@@ -16,9 +15,9 @@ class HomeNavigator extends StatefulWidget {
 class _HomeNavigatorState extends State<HomeNavigator> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
-    MainProvider mainProvider = Provider.of<MainProvider>(context);
+    final MainProvider _mainProvider = Provider.of<MainProvider>(context);
     return Navigator(
-      key: mainProvider.homeNavigatorKey,
+      key: _mainProvider.homeNavigatorKey,
       onGenerateRoute: (RouteSettings settings) {
         return MaterialPageRoute(
             settings: settings,
@@ -26,8 +25,6 @@ class _HomeNavigatorState extends State<HomeNavigator> with AutomaticKeepAliveCl
               switch (settings.name) {
                 case '/':
                   return HomePage();
-                case '/product_detail':
-                  return ProductDetailPage();
                 default:
                   return Container(
                       child: Scaffold(
@@ -46,36 +43,36 @@ class _HomeNavigatorState extends State<HomeNavigator> with AutomaticKeepAliveCl
   bool get wantKeepAlive => true;
 }
 
-class Books1 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        AppBar(
-          title: Text("Books 1"),
-        ),
-        FlatButton(
-          child: Text("Go to books 2"),
-          onPressed: () => Navigator.pushNamed(context, '/books2'),
-        ),
-      ],
-    );
-  }
-}
-
-class Books2 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final params = ModalRoute.of(context).settings.arguments;
-
-    print(params);
-
-    return Column(
-      children: <Widget>[
-        AppBar(
-          title: Text("Books 2"),
-        )
-      ],
-    );
-  }
-}
+//class Books1 extends StatelessWidget {
+//  @override
+//  Widget build(BuildContext context) {
+//    return Column(
+//      children: <Widget>[
+//        AppBar(
+//          title: Text("Books 1"),
+//        ),
+//        FlatButton(
+//          child: Text("Go to books 2"),
+//          onPressed: () => Navigator.pushNamed(context, '/books2'),
+//        ),
+//      ],
+//    );
+//  }
+//}
+//
+//class Books2 extends StatelessWidget {
+//  @override
+//  Widget build(BuildContext context) {
+//    final params = ModalRoute.of(context).settings.arguments;
+//
+//    print(params);
+//
+//    return Column(
+//      children: <Widget>[
+//        AppBar(
+//          title: Text("Books 2"),
+//        )
+//      ],
+//    );
+//  }
+//}
