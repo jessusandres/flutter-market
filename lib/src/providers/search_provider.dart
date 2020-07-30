@@ -197,7 +197,7 @@ class SearchProvider with ChangeNotifier {
 
 
     final url =
-        '$storeUrlAPI/search/products?line=$lineSelected&subline=$subLineSelected&brand=$brandSelected&item=$itemName&auth=$globalToken';
+        '$baseUrlAPI/search/$urlStore/products?line=$lineSelected&subline=$subLineSelected&brand=$brandSelected&item=$itemName&auth=$globalToken';
 
     final response = await http.get(url);
 

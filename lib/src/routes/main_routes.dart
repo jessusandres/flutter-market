@@ -5,7 +5,6 @@ import 'package:gustolact/src/pages/drawer_pages/profile_page.dart';
 import 'package:gustolact/src/pages/drawer_pages/shared_page.dart';
 import 'package:gustolact/src/pages/filter_page.dart';
 import 'package:gustolact/src/pages/main_page.dart';
-import 'package:gustolact/src/pages/product_detail_page.dart';
 
 final mainRoutes = {
   '/': (BuildContext context) => MainPage(),

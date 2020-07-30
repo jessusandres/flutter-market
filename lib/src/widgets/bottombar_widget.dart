@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gustolact/src/providers/cart_provider.dart';
 import 'package:gustolact/src/providers/main_provider.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/themes/light_color.dart';
@@ -62,6 +63,8 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
 
   Widget _icon(IconData icon, bool isEnable, int index, MainProvider mainProvider) {
 
+    final CartProvider _cartProvider = Provider.of<CartProvider>(context);
+
     if(isEnable) {
       _handlePressed(mainProvider.indexPage);
     }
@@ -71,7 +74,10 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
         borderRadius: BorderRadius.all(Radius.circular(50)),
         onTap: () {
           mainProvider.indexPage = index;
-          _handlePressed(mainProvider.indexPage);
+          if(index == 3) {
+            _cartProvider.getCart();
+          }
+            _handlePressed(mainProvider.indexPage);
         },
         child: AnimatedContainer(
           duration: Duration(milliseconds: 500),

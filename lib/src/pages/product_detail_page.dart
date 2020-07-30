@@ -3,7 +3,12 @@ import 'package:flutter_html/html_parser.dart';
 import 'package:flutter_html/style.dart';
 import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/models/product_model.dart';
+import 'package:gustolact/src/pages/login_page.dart';
+import 'package:gustolact/src/providers/login_provider.dart';
 import 'package:gustolact/src/providers/product_provider.dart';
+import 'package:gustolact/src/tansitions/fade_transition.dart';
+import 'package:gustolact/src/tansitions/scale_transition.dart';
+import 'package:gustolact/src/tansitions/slide_transition.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/themes/light_color.dart';
 import 'package:gustolact/src/widgets/product_cards_widget.dart';
@@ -292,23 +297,21 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 class ButtonFll extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () {
-        final snackBar = SnackBar(
-          content: Text('Producto agregado!'),
-          action: SnackBarAction(
-            label: 'Ocultar',
-            onPressed: () {
-              // Some code to undo the change.
-            },
-          ),
-        );
 
-        Scaffold.of(context).showSnackBar(snackBar);
+    final LoginProvider _loginProvider = Provider.of<LoginProvider>(context);
+
+    return FloatingActionButton(
+      onPressed: (_loginProvider.isLogged) ? addItemToCart : (){
+        Navigator.push(context,SlideTopRoute(page: LoginPage(showBackbutton: true)));
       },
       backgroundColor: AppTheme.primaryColor,
       child: Icon(Icons.add_circle,
           color: AppTheme.white),
     );
   }
+
+  addItemToCart() {
+    print("add");
+  }
+
 }

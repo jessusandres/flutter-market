@@ -2,9 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/providers/login_provider.dart';
+import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
+  final bool showBackbutton;
+
+  const LoginPage({this.showBackbutton = false});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -12,6 +17,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   LoginProvider loginProvider;
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
+  bool _showPassword = false;
 
   @override
   void dispose() {
@@ -123,9 +129,20 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 29.0),
       child: TextField(
-        maxLength: 10,
-        obscureText: true,
+//        maxLength: 10,
+        obscureText: !this._showPassword,
         decoration: InputDecoration(
+            suffix: IconButton(
+              icon: (!this._showPassword)
+                  ? Icon(Icons.remove_red_eye)
+                  : Icon(Icons.lock),
+              color: (this._showPassword) ? Colors.grey : AppTheme.primaryColor,
+              onPressed: () {
+                setState(() {
+                  this._showPassword = !this._showPassword;
+                });
+              },
+            ),
             icon: Icon(
               Icons.lock_outline,
             ),
@@ -145,10 +162,6 @@ class _LoginPageState extends State<LoginPage> {
     final LoginProvider loginProvider = Provider.of<LoginProvider>(context);
 
     return RaisedButton(
-//      onPressed: (){
-//        loginProvider.isLogged = true;
-//        Navigator.pop(context);
-//      },
       onPressed: (loginProvider.isValid && !loginProvider.loadingSign)
           ? () {
               loginUser(loginProvider, context);
@@ -180,7 +193,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _fieldsContainer(List<Widget> children, Size size) {
     return Container(
       width: size.width * 0.75,
-      padding: EdgeInsets.symmetric(vertical: 50.0),
+      padding: EdgeInsets.symmetric(vertical: 30.0),
       margin: EdgeInsets.symmetric(vertical: 10.0),
       decoration: BoxDecoration(
           color: Colors.white,
@@ -205,6 +218,7 @@ class _LoginPageState extends State<LoginPage> {
     final LoginProvider loginProvider = Provider.of<LoginProvider>(context);
 
     return SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
       child: Column(
         children: <Widget>[
           SafeArea(
@@ -213,11 +227,31 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           _fieldsContainer([
+            (widget.showBackbutton)
+                ? Container(
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor,
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    width: 50,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: AppTheme.white,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  )
+                : Container(),
+            (widget.showBackbutton) ? SizedBox(height: 15.0) : Container(),
             Text(
               'LOGIN',
-              style: TextStyle(fontSize: 20.0),
+//                  style: TextStyle(fontSize: 20.0),
+              style: AppTheme.caption.copyWith(fontSize: 22),
             ),
-            SizedBox(height: 50.0),
+            SizedBox(height: 30.0),
             _emailField(loginProvider),
             SizedBox(height: 30),
             _passwordField(loginProvider),
@@ -237,11 +271,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   loginUser(LoginProvider loginProvider, BuildContext mcontext) async {
-
     final response = await loginProvider.loginUser();
     print(response);
     if (!response['ok']) {
-
       this._scaffoldKey.currentState.showSnackBar(SnackBar(
             content: Text(response['message']),
             action: SnackBarAction(
@@ -254,6 +286,5 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     Navigator.pop(context);
-
   }
 }

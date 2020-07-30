@@ -35,6 +35,7 @@ class AppTheme {
   static const Color spacer = Color(0xFFF2F2F2);
   static const String fontName = 'WorkSans';
   static const Color primaryColor = Color.fromRGBO(242, 143, 43, 1.0);
+  static const Color dangerColor = Colors.redAccent;
 
   static const TextTheme textTheme = TextTheme(
     headline4: display1,
