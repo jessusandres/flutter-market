@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 
 
 class LoginProvider with ChangeNotifier {
+
   UserPreferences _userPreferences;
   SecurePreferences _securePreferences;
 
@@ -43,6 +44,7 @@ class LoginProvider with ChangeNotifier {
     _userPreferences = new UserPreferences();
     _securePreferences = new SecurePreferences();
     print('==LOGIN PROVIDER IS INIT==');
+    this.verifyLogin();
   }
 
   reset() {
@@ -75,15 +77,18 @@ class LoginProvider with ChangeNotifier {
       final payload = Jwt.parseJwt(decode['token']);
 
       final _fullname = "${payload['user']['userName']} ${payload['user']['userLastname']}";
+      final _userCode = payload['user']['userCode'];
 
       final expirationDate = payload['exp'];
       this._userPreferences.userEmail = this.email.value;
       this._userPreferences.authToken = decode['token'];
       this._userPreferences.userFullName = _fullname;
+      this._userPreferences.userCode = _userCode;
 
       await this._securePreferences.setUserPassword(this._password.value);
 
       this.isLogged = true;
+
       this.expirationDate = expirationDate;
 
       return {'ok': true};
@@ -112,17 +117,18 @@ class LoginProvider with ChangeNotifier {
     if (decode['ok'] == true) {
       final payload = Jwt.parseJwt(decode['token']);
       final expirationDate = payload['exp'];
-
+      final _userCode = payload['user']['userCode'];
       final _fullname = "${payload['user']['userName']} ${payload['user']['userLastname']}";
       // TODO : save user email and paswword in secure storage -- save token in user preferences
       this._userPreferences.userEmail = femail;
       this._userPreferences.userFullName = _fullname;
+      this._userPreferences.userCode = _userCode;
       this._userPreferences.authToken = decode['token'];
       await this._securePreferences.setUserPassword(fpassword);
 
       //TODO CAMBIAR NOMBRE
       this.expirationDate = expirationDate;
-      notifyListeners();
+      this.isLogged = true;
 
       return true;
     }
@@ -164,11 +170,16 @@ class LoginProvider with ChangeNotifier {
           this._refreshToken(this._userPreferences.authToken);
 
         } else {
+
           this.expirationDate = expirationDate;
           this._isLogged = true;
+          notifyListeners();
+
         }
 
-      } else {
+
+      }
+      else {
         print("local data is empty");
         if (this._isLogged == true) {
           this._isLogged = false;
@@ -185,6 +196,7 @@ class LoginProvider with ChangeNotifier {
   }
 
   void _refreshToken(String token) async {
+
     final verificationUrl = '$baseUrlAPI/login/verification?token=$token';
     final refreshUrl = '$baseUrlAPI/login/refreshToken?token=$token';
 
@@ -196,14 +208,14 @@ class LoginProvider with ChangeNotifier {
 
       final rfrdecoded = jsonDecode(rfrresponse.body);
 
-      print("rfrde: $rfrdecoded");
+//      print("rfrde: $rfrdecoded");
 
-      print("jwt: ${Jwt.parseJwt(rfrdecoded['newToken'])}");
+//      print("jwt: ${Jwt.parseJwt(rfrdecoded['newToken'])}");
 
       final payload = Jwt.parseJwt(rfrdecoded['newToken']);
 
       final expirationDate = payload['exp'];
-
+      final _userCode = payload['user']['userCode'];
       final _fullname = "${payload['user']['userName']} ${payload['user']['userLastname']}";
       final _email = payload['user']['userEmail'];
 
@@ -213,20 +225,22 @@ class LoginProvider with ChangeNotifier {
       this.expirationDate = expirationDate;
       this._userPreferences.authToken = rfrdecoded['newToken'];
       this._userPreferences.userFullName = _fullname;
+      this._userPreferences.userCode = _userCode;
       this._userPreferences.userEmail = _email;
 
-      notifyListeners();
+      this.isLogged = true;
 
     } else {
-      print("de : $decoded");
+
+//      print("de : $decoded");
+
       if (decoded['err']['name'] == 'TokenExpiredError') {
-        print("refresh by expired");
-        //TODO : login
+//        print("refresh by expired");
 
         await this._loginExpiration(this._userPreferences.userEmail,
             await this._securePreferences.userPassword);
       } else {
-        print('no auth');
+//        print('no auth');
         // TODO : Manejo de posible incrustación de codigo
         this._userPreferences.clear();
         this._securePreferences.clear();

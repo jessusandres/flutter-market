@@ -39,6 +39,14 @@ class UserPreferences {
     this._preferences.setString("rm_username", name);
   }
 
+  get userCode{
+    return this._preferences.get("rm_usercode");
+  }
+
+  set userCode(String code) {
+    this._preferences.setString("rm_usercode", code);
+  }
+
 
   get all => this._preferences.getKeys();
 

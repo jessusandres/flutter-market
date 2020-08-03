@@ -6,8 +6,6 @@ import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/pages/login_page.dart';
 import 'package:gustolact/src/providers/login_provider.dart';
 import 'package:gustolact/src/providers/main_provider.dart';
-import 'package:gustolact/src/tansitions/fade_transition.dart';
-import 'package:gustolact/src/tansitions/slide_transition.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -18,8 +16,6 @@ class DrawerMarket extends StatelessWidget {
     final LoginProvider _loginProvider = Provider.of<LoginProvider>(context);
     return Drawer(
       child: Container(
-//        color: Colors.red,
-//        height: double.infinity,
         child: Column(
           children: <Widget>[
             Container(
@@ -32,7 +28,7 @@ class DrawerMarket extends StatelessWidget {
             ),
             Container(
               height: 210,
-//              width: double.infinity,
+              width: double.infinity,
               child: FadeInImage(
                 placeholder: AssetImage('assets/gif/spinner.gif'),
                 image: NetworkImage(storeAvatar),
@@ -61,6 +57,7 @@ class DrawerMarket extends StatelessWidget {
               onTap: () {
                 if (_mainProvider.drawerPage == 0) return;
                 _mainProvider.drawerPage = 0;
+                _loginProvider.verifyLogin();
                 Navigator.pushReplacementNamed(context, '/');
               },
             ),
@@ -85,6 +82,7 @@ class DrawerMarket extends StatelessWidget {
               onTap: () {
                 if (_mainProvider.drawerPage == 1) return;
                 _mainProvider.drawerPage = 1;
+                _loginProvider.verifyLogin();
                 Navigator.pushReplacementNamed(context, 'profile');
               },
             ),
@@ -109,6 +107,7 @@ class DrawerMarket extends StatelessWidget {
               onTap: () {
                 if (_mainProvider.drawerPage == 2) return;
                 _mainProvider.drawerPage = 2;
+                _loginProvider.verifyLogin();
                 Navigator.pushReplacementNamed(context, 'cotizations');
               },
             ),
@@ -133,6 +132,7 @@ class DrawerMarket extends StatelessWidget {
               onTap: () {
                 if (_mainProvider.drawerPage == 3) return;
                 _mainProvider.drawerPage = 3;
+                _loginProvider.verifyLogin();
                 Navigator.pushReplacementNamed(context, 'settings');
               },
             ),

@@ -62,17 +62,6 @@ class __MantenimientoContainerState extends State<_MantenimientoContainer>
     _animationController.forward();
 
     return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Color.fromRGBO(228, 174, 131, 1.0)
-      ),
-      height: double.infinity,
-      child: Center(
-        child: TextoMantenimiento(),
-      ),
-    );
-
-    return Container(
       color: Color.fromRGBO(255, 200, 0, 1),
       width: double.infinity,
       height: double.infinity,

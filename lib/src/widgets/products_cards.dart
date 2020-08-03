@@ -27,10 +27,11 @@ class ListProducts extends StatelessWidget {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black45,
-                    blurRadius: 15,
-                    offset: Offset(2.0, 12.0),
-                    spreadRadius: 0.01)
+                    color: Colors.black38,
+                    blurRadius: 6,
+                    offset: Offset(0.5, 1.0),
+                    spreadRadius: 0.5
+                    )
               ]),
 //          padding: const EdgeInsets.all(8),
           child: Column(
@@ -70,11 +71,7 @@ class ListProducts extends StatelessWidget {
       storeCards.add(GestureDetector(
         child: container,
         onTap: () {
-//          Navigator.of(context).pushNamed('productDetail', arguments:  product );
-//          Navigator.pushNamed(context, '/product_detail', arguments: product);
-
          Navigator.push(context, FadeRoute( page: ProductDetailPage(detailProduct: product,) ) );
-
         },
       ));
     });

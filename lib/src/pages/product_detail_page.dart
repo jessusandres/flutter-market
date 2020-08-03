@@ -4,10 +4,9 @@ import 'package:flutter_html/style.dart';
 import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/models/product_model.dart';
 import 'package:gustolact/src/pages/login_page.dart';
+import 'package:gustolact/src/providers/cart_provider.dart';
 import 'package:gustolact/src/providers/login_provider.dart';
 import 'package:gustolact/src/providers/product_provider.dart';
-import 'package:gustolact/src/tansitions/fade_transition.dart';
-import 'package:gustolact/src/tansitions/scale_transition.dart';
 import 'package:gustolact/src/tansitions/slide_transition.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/themes/light_color.dart';
@@ -17,13 +16,13 @@ import 'package:gustolact/src/widgets/title_text.dart';
 import 'package:provider/provider.dart';
 
 class ProductDetailPage extends StatefulWidget {
-
   final ProductModel detailProduct;
 
-  ProductDetailPage({Key key,@required this.detailProduct}) : super(key: key);
+  ProductDetailPage({Key key, @required this.detailProduct}) : super(key: key);
 
   @override
-  _ProductDetailPageState createState() => _ProductDetailPageState(this.detailProduct);
+  _ProductDetailPageState createState() =>
+      _ProductDetailPageState(this.detailProduct);
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage>
@@ -50,44 +49,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     controller.dispose();
     super.dispose();
   }
-
-  bool isLiked = true;
-
-//  Widget _icon(
-//    IconData icon, {
-//    Color color = LightColor.iconColor,
-//    double size = 20,
-//    double padding = 10,
-//    bool isOutLine = false,
-//    Function onPressed,
-//  }) {
-//    return Container(
-//      height: 40,
-//      width: 40,
-//      padding: EdgeInsets.all(padding),
-//      // margin: EdgeInsets.all(padding),
-//      decoration: BoxDecoration(
-//        border: Border.all(
-//            color: LightColor.iconColor,
-//            style: isOutLine ? BorderStyle.solid : BorderStyle.none),
-//        borderRadius: BorderRadius.all(Radius.circular(13)),
-//        color:
-//            isOutLine ? Colors.transparent : Theme.of(context).backgroundColor,
-//        boxShadow: <BoxShadow>[
-//          BoxShadow(
-//              color: Color(0xfff8f8f8),
-//              blurRadius: 5,
-//              spreadRadius: 10,
-//              offset: Offset(5, 5)),
-//        ],
-//      ),
-//      child: Icon(icon, color: color, size: size),
-//    ).ripple(() {
-//      if (onPressed != null) {
-//        onPressed();
-//      }
-//    }, borderRadius: BorderRadius.all(Radius.circular(13)));
-//  }
 
   Widget _productImage(ProductModel product) {
     return AnimatedBuilder(
@@ -254,10 +215,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   @override
   Widget build(BuildContext context) {
+    final ProductProvider _productProvider =
+        Provider.of<ProductProvider>(context);
 
-    final ProductProvider _productProvider = Provider.of<ProductProvider>(context);
-
-//    final ProductModel _product = ModalRoute.of(context).settings.arguments;
 
     _productProvider.getProductImages(_product.codi);
     _productProvider.getRelatedProducts(_product.codi);
@@ -265,7 +225,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     MediaQueryData media = MediaQuery.of(context);
 
     return Scaffold(
-      floatingActionButton: ButtonFll(),
+      floatingActionButton: ButtonFll(
+        product: widget.detailProduct,
+      ),
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
@@ -295,23 +257,59 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 }
 
 class ButtonFll extends StatelessWidget {
+  final ProductModel product;
+
+  const ButtonFll({@required this.product});
+
   @override
   Widget build(BuildContext context) {
-
     final LoginProvider _loginProvider = Provider.of<LoginProvider>(context);
+    final CartProvider _cartProvider = Provider.of<CartProvider>(context);
 
     return FloatingActionButton(
-      onPressed: (_loginProvider.isLogged) ? addItemToCart : (){
-        Navigator.push(context,SlideTopRoute(page: LoginPage(showBackbutton: true)));
-      },
-      backgroundColor: AppTheme.primaryColor,
-      child: Icon(Icons.add_circle,
-          color: AppTheme.white),
+      onPressed: _cartProvider.executingAction
+          ? null
+          : () {
+              if (_loginProvider.isLogged) {
+                addItemToCart(context);
+              } else {
+                Navigator.push(context,
+                    SlideTopRoute(page: LoginPage(showBackbutton: true)));
+              }
+            },
+      backgroundColor: _cartProvider.executingAction ? AppTheme.grey : AppTheme.primaryColor,
+      child: Icon(Icons.add_circle, color: AppTheme.white),
     );
   }
 
-  addItemToCart() {
-    print("add");
-  }
+  addItemToCart(BuildContext context) async {
+    final CartProvider cartProvider =
+        Provider.of<CartProvider>(context, listen: false);
 
+    final response =
+        await cartProvider.addItemToCart(itemCode: product.codi, ammount: 1.0);
+//    print(response);
+    if (response["observation"] != null) {
+      final osnackBar = SnackBar(
+        content: Text(response["observation"]),
+        action: SnackBarAction(
+          label: 'Aceptar',
+          onPressed: () {},
+        ),
+      );
+
+      Scaffold.of(context).showSnackBar(osnackBar);
+    }
+    final snackBar = SnackBar(
+      content: Text(response["message"]),
+      action: SnackBarAction(
+        label: 'Ocultar',
+        onPressed: () {
+          // Some code to undo the change.
+        },
+      ),
+    );
+
+    Scaffold.of(context).showSnackBar(snackBar);
+  }
 }

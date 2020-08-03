@@ -14,9 +14,9 @@ import 'package:gustolact/src/shared_preferences/user_preferences.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 
-void setupLocator() {
-  locator.registerLazySingleton(() => NavigationService());
-}
+// void setupLocator() {
+//   locator.registerLazySingleton(() => NavigationService());
+// }
 
 void main() async{
 
@@ -24,7 +24,7 @@ void main() async{
   final preferences = new UserPreferences();
   await preferences.initPrefences();
 
-  setupLocator();
+  locator.registerLazySingleton(() => NavigationService());
   runApp(MyApp());
 }
 
@@ -33,19 +33,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: Color.fromRGBO(52, 54, 101, 0.0),
-        statusBarIconBrightness: Brightness.light
-    ));
+//    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+//        statusBarColor: Color.fromRGBO(52, 54, 101, 0.0),
+//        statusBarIconBrightness: Brightness.dark
+//    ));
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => new MainProvider(),),
-        ChangeNotifierProvider(create: (_) => new HomeProvider(),),
-        ChangeNotifierProvider(create: (_) => new ProductProvider(),),
-        ChangeNotifierProvider(create: (_) => new SearchProvider()),
-        ChangeNotifierProvider(create: (_) => new LoginProvider()),
-        ChangeNotifierProvider(create: (_) => new CartProvider()),
+        ChangeNotifierProvider<MainProvider>(create: (_) => new MainProvider(),),
+        ChangeNotifierProvider<HomeProvider>(create: (_) => new HomeProvider(),),
+        ChangeNotifierProvider<ProductProvider>(create: (_) => new ProductProvider(),),
+        ChangeNotifierProvider<SearchProvider>(create: (_) => new SearchProvider()),
+        ChangeNotifierProvider<LoginProvider>(create: (_) => new LoginProvider()),
+        ChangeNotifierProvider<CartProvider>(create: (_) => new CartProvider()),
       ],
       child: MaterialApp(
         theme: AppTheme.lightTheme.copyWith(

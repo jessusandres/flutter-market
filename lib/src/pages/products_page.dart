@@ -13,6 +13,7 @@ class _HomeIndexPageState extends State<HomeProductsPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
 
     final ProductProvider _productProvider =
         Provider.of<ProductProvider>(context);

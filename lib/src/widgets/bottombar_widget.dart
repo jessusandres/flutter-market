@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/providers/cart_provider.dart';
+import 'package:gustolact/src/providers/login_provider.dart';
 import 'package:gustolact/src/providers/main_provider.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/themes/light_color.dart';
@@ -61,11 +62,12 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
     super.dispose();
   }
 
-  Widget _icon(IconData icon, bool isEnable, int index, MainProvider mainProvider) {
-
+  Widget _icon(
+      IconData icon, bool isEnable, int index, MainProvider mainProvider) {
     final CartProvider _cartProvider = Provider.of<CartProvider>(context);
+    final LoginProvider _loginProvider = Provider.of<LoginProvider>(context);
 
-    if(isEnable) {
+    if (isEnable) {
       _handlePressed(mainProvider.indexPage);
     }
 
@@ -74,10 +76,11 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
         borderRadius: BorderRadius.all(Radius.circular(50)),
         onTap: () {
           mainProvider.indexPage = index;
-          if(index == 3) {
+          if (index == 3) {
             _cartProvider.getCart();
           }
-            _handlePressed(mainProvider.indexPage);
+          _loginProvider.verifyLogin();
+          _handlePressed(mainProvider.indexPage);
         },
         child: AnimatedContainer(
           duration: Duration(milliseconds: 500),
@@ -143,7 +146,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
         duration: Duration(milliseconds: 25));
     Future.delayed(
       Duration(milliseconds: 25),
-          () {
+      () {
         _yController.animateTo(1.0, duration: Duration(milliseconds: 25));
       },
     );
@@ -152,43 +155,49 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
 
   @override
   Widget build(BuildContext context) {
-
     final appSize = MediaQuery.of(context).size;
     final height = 60.0;
     final MainProvider _mainProvider = Provider.of<MainProvider>(context);
 
-    return ( _mainProvider.drawerPage == 0 ) ?
-    Container(
-      color: Colors.white,
-      width: appSize.width,
-      height: 60,
-      child: Stack(
-        children: [
-          Positioned(
-            left: 0,
-            bottom: 0,
+    return (_mainProvider.drawerPage == 0)
+        ? Container(
+            color: Colors.white,
             width: appSize.width,
-            height: height - 10,
-            child: _buildBackground(),
-          ),
-          Positioned(
-            left: (appSize.width - _getButtonContainerWidth()) / 2,
-            top: 0,
-            width: _getButtonContainerWidth(),
-            height: height,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                _icon(Icons.home, _mainProvider.indexPage == 0, 0, _mainProvider),
-                _icon(Icons.search, _mainProvider.indexPage == 1, 1, _mainProvider),
-                _icon(Icons.message, _mainProvider.indexPage == 2, 2, _mainProvider),
-                _icon(Icons.shopping_cart, _mainProvider.indexPage == 3, 3, _mainProvider),
+            height: 60,
+            child: Stack(
+              children: [
+                Positioned(
+                  left: 0,
+                  bottom: 0,
+                  width: appSize.width,
+                  height: height - 10,
+                  child: _buildBackground(),
+                ),
+                Positioned(
+                  left: (appSize.width - _getButtonContainerWidth()) / 2,
+                  top: 0,
+                  width: _getButtonContainerWidth(),
+                  height: height,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      _icon(Icons.home, _mainProvider.indexPage == 0, 0,
+                          _mainProvider),
+                      _icon(Icons.search, _mainProvider.indexPage == 1, 1,
+                          _mainProvider),
+                      _icon(Icons.message, _mainProvider.indexPage == 2, 2,
+                          _mainProvider),
+                      _icon(Icons.shopping_cart, _mainProvider.indexPage == 3,
+                          3, _mainProvider),
+                    ],
+                  ),
+                ),
               ],
             ),
-          ),
-        ],
-      ),
-    )
-    : Container(width: 0.0,height: 0.0,);
+          )
+        : Container(
+            width: 0.0,
+            height: 0.0,
+          );
   }
 }

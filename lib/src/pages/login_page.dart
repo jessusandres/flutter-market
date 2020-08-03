@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/config/config.dart';
+import 'package:gustolact/src/providers/cart_provider.dart';
 import 'package:gustolact/src/providers/login_provider.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:provider/provider.dart';
@@ -183,12 +184,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  _login(BuildContext context) {
-    print("==== INFO ===");
-//    print("Email: ${bloc.email}");
-//    print("Email: ${bloc.password}");
-//    Navigator.pushReplacementNamed(context, 'home');
-  }
 
   Widget _fieldsContainer(List<Widget> children, Size size) {
     return Container(
@@ -284,7 +279,10 @@ class _LoginPageState extends State<LoginPage> {
 
       return;
     }
-
+    final CartProvider cartProvider = Provider.of<CartProvider>(context, listen: false);
+    if(cartProvider.loadingCart == false) {
+      cartProvider.getCart();
+    }
     Navigator.pop(context);
   }
 }

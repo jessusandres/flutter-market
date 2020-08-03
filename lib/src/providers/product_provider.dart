@@ -36,11 +36,6 @@ class ProductProvider with ChangeNotifier {
       Future.delayed(Duration(seconds: 3),(){
         notifyListeners();
       });
-//      Timer timer;
-//      timer = Timer(Duration(seconds: 3), () {
-//        notifyListeners();
-//        timer.cancel();
-//      });
     }
   }
 
@@ -81,7 +76,10 @@ class ProductProvider with ChangeNotifier {
   }
 
   Future<List<ProductModel>> refreshProducts() async {
+    print("refresh");
     loading = true;
+
+    this._allProducts = [];
 
     final url = '$storeUrlAPI/products?auth=$globalToken';
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gustolact/src/models/product_model.dart';
 import 'package:gustolact/src/pages/product_detail_page.dart';
 import 'package:gustolact/src/providers/search_provider.dart';
-import 'package:gustolact/src/tansitions/scale_transition.dart';
 import 'package:provider/provider.dart';
 
 class SugerencesList extends StatelessWidget {

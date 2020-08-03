@@ -1,0 +1,4 @@
+enum PaymentOptions {
+  card,
+  efective
+}

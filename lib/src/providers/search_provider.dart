@@ -183,9 +183,26 @@ class SearchProvider with ChangeNotifier {
 
   Timer mtimer;
 
+  String oldQuery;
+  String oldLine;
+  String oldSubLine;
+  String oldBrand;
+  int oldOrder;
+
   filterProducts() async {
 
     this.showBottomButton = false;
+
+    if(this.brandSelected == oldBrand &&
+    this.lineSelected == oldLine &&
+    this.subLineSelected == oldSubLine &&
+    this.query == oldQuery &&
+    this.order == oldOrder) {
+      print("equqls");
+      this.loadQuery = false;
+      return ;
+    }
+
 
     this.filterResults = [];
 
@@ -225,6 +242,12 @@ class SearchProvider with ChangeNotifier {
     }
 
     this.filterResults.addAll(productsRecived);
+
+    this.oldBrand = brandSelected;
+    this.oldLine = lineSelected;
+    this.oldSubLine = subLineSelected;
+    this.oldQuery = query;
+    this.oldOrder = order;
 
     this.loadQuery = false;
     notifyListeners();

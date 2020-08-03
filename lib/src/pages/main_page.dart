@@ -18,7 +18,8 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage>  with AutomaticKeepAliveClientMixin {
+class _MainPageState extends State<MainPage>
+    with AutomaticKeepAliveClientMixin {
   int _selectedIndex = 0;
 
   List<GlobalKey<NavigatorState>> _navigatorKeys;
@@ -28,23 +29,17 @@ class _MainPageState extends State<MainPage>  with AutomaticKeepAliveClientMixin
   MainProvider _mainProvider;
 
   Future<bool> _systemBackButtonPressed() {
-
     if (_navigatorKeys[_selectedIndex].currentState.canPop()) {
-
       _navigatorKeys[_selectedIndex]
           .currentState
           .pop(_navigatorKeys[_selectedIndex].currentContext);
     } else {
-
-
-      if(_mainProvider.indexPage == 0) {
+      if (_mainProvider.indexPage == 0) {
         SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop');
-      }else {
+      } else {
         _mainProvider.indexPage = 0;
       }
-
     }
-
   }
 
   DrawerIndex drawerIndex;
@@ -54,38 +49,59 @@ class _MainPageState extends State<MainPage>  with AutomaticKeepAliveClientMixin
   void initState() {
     drawerIndex = DrawerIndex.HOME;
     screenView = HomeNavigator();
+
     super.initState();
   }
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+        statusBarColor: Color.fromRGBO(52, 54, 101, 0.0),
+        statusBarIconBrightness: Brightness.light));
+
+    super.build(context);
+
     _mainProvider = Provider.of<MainProvider>(context);
-    final ProductProvider _productProvider = Provider.of<ProductProvider>(context);
+    final ProductProvider _productProvider =
+        Provider.of<ProductProvider>(context);
 
     this._navigatorKeys = [
       _mainProvider.homeNavigatorKey,
     ];
 
+//
+//    transitionBuilder: (Widget child, Animation<double> animation) {
+//
+//      var begin = Offset(0.3, 1.0);
+//      var end = Offset.zero;
+//      var curve = Curves.ease;
+//      var tween =
+//      Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+//
+//      return SlideTransition(
+//        position: animation.drive(tween),
+//        child: child,
+//      );
+//    }
+
+    final LoginProvider loginProvider = Provider.of<LoginProvider>(context);
 
     return AnimatedSwitcher(
-
         duration: Duration(milliseconds: 2400),
         transitionBuilder: (Widget child, Animation<double> animation) {
+          final begin = Offset(0.3, 1.0);
+          final end = Offset.zero;
+          final curve = Curves.ease;
+          final tween =
+              Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: curve));
 
-          var begin = Offset(0.3, 1.0);
-          var end = Offset.zero;
-          var curve = Curves.ease;
-          var tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-          return SlideTransition(
-            position: animation.drive(tween),
+          return FadeTransition(
+            opacity: animation.drive(tween),
             child: child,
           );
         },
         child: (_productProvider.mainLoading)
-            ? _mcontainer(true)
+            ? _loadingContainer()
             : Container(
                 color: AppTheme.nearlyWhite,
                 child: SafeArea(
@@ -110,43 +126,10 @@ class _MainPageState extends State<MainPage>  with AutomaticKeepAliveClientMixin
                     ),
                   ),
                 ),
-              )
-        );
-
-
+              ));
   }
 
-//  void changeIndex(DrawerIndex drawerIndexdata) {
-//
-//    if (drawerIndex != drawerIndexdata) {
-//      drawerIndex = drawerIndexdata;
-//      if (drawerIndex == DrawerIndex.HOME) {
-//        setState(() {
-//          screenView = HomeNavigator();
-//        });
-//      } else if (drawerIndex == DrawerIndex.Help) {
-//        setState(() {
-//          screenView = UnavaiablePage();
-//        });
-//      } else if (drawerIndex == DrawerIndex.FeedBack) {
-//        setState(() {
-//          screenView = UnavaiablePage();
-//        });
-//      } else if (drawerIndex == DrawerIndex.Invite) {
-//        setState(() {
-//          screenView = UnavaiablePage();
-//        });
-//      } else {
-//        setState(() {
-//          screenView = UnavaiablePage();
-//        });
-//      }
-//    }
-//
-//  }
-
-  Widget _mcontainer(bool loading) {
-
+  Widget _loadingContainer() {
     return Scaffold(
       body: Container(
         color: Colors.white,
@@ -163,5 +146,4 @@ class _MainPageState extends State<MainPage>  with AutomaticKeepAliveClientMixin
 
   @override
   bool get wantKeepAlive => true;
-
 }

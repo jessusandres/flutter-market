@@ -3,7 +3,9 @@ import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/config/key.dart';
 import 'package:gustolact/src/models/image_model.dart';
 import 'package:gustolact/src/models/product_model.dart';
+import 'package:gustolact/src/pages/product_detail_page.dart';
 import 'package:gustolact/src/providers/product_provider.dart';
+import 'package:gustolact/src/tansitions/fade_transition.dart';
 import 'package:provider/provider.dart';
 
 class CardProduct extends StatelessWidget {
@@ -58,7 +60,8 @@ class CardProduct extends StatelessWidget {
       child: productCard,
       onTap: (){
 //        Navigator.pushNamed(context, '/product_detail',arguments:  _currentProduct );
-        locator<NavigationService>().navigateToDetail(_currentProduct);
+//        locator<NavigationService>().navigateToDetail(_currentProduct);
+        Navigator.push(context, FadeRoute( page: ProductDetailPage(detailProduct: _currentProduct,) ) );
       },
     );
   }

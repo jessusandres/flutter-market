@@ -42,7 +42,6 @@ class ProductCards extends StatelessWidget {
                 height: size.height * 0.4,
                 child: Swiper(
                     autoplay: false,
-//                    pagination: SwiperPagination(),
                     layout: SwiperLayout.DEFAULT,
                     itemWidth: size.width * 0.7,
                     itemHeight: size.height,
