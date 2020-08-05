@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gustolact/src/models/departaments_model.dart';
 import 'package:gustolact/src/models/districts_model.dart';
 import 'package:gustolact/src/models/provinces_model.dart';
+import 'package:gustolact/src/models/user_addresses_model.dart';
 import 'package:gustolact/src/options/payment_options.dart';
 import 'package:gustolact/src/providers/steps_provider.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
@@ -13,14 +14,8 @@ class UserReferencePage extends StatefulWidget {
 }
 
 class _UserReferencePageState extends State<UserReferencePage> {
-
-  int _direction = 0;
-  TextEditingController _textEditingController;
-
-// _textEditingController = new TextEditingController( text: _userName );
   @override
   Widget build(BuildContext context) {
-
     Size size = MediaQuery.of(context).size;
 
     final StepsProvider _stepsProvider = Provider.of<StepsProvider>(context);
@@ -35,61 +30,122 @@ class _UserReferencePageState extends State<UserReferencePage> {
             SizedBox(
               height: 25,
             ),
-            Text(
-              'Datos de Pago:',
-              style: AppTheme.caption.copyWith(fontSize: 20),
+            Container(
+              margin: EdgeInsets.only(bottom: 10),
+              child: Center(
+                child: Text(
+                  'Datos de Pago:',
+                  style: AppTheme.caption.copyWith(fontSize: 20),
+                ),
+              ),
             ),
             Divider(
               color: AppTheme.primaryColor,
               thickness: 1.3,
             ),
             _PaymentOptions(size: size, stepsProvider: _stepsProvider),
+            (_stepsProvider.paymentOptionSelected == PaymentOptions.efective)
+                ? AnimatedContainer(
+                    duration: Duration(milliseconds: 150),
+                    curve: Curves.easeIn,
+                    margin: EdgeInsets.only(bottom: 10),
+                    child: TextField(
+                      maxLines: 1,
+                      autofocus: false,
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
+                      decoration: InputDecoration(
+                        errorText: _stepsProvider.effectiveEntered.error,
+                        icon: Icon(Icons.attach_money),
+                        labelText: 'Monto de Efectivo',
+                        helperText: 'Monto de Efectivo para pagar',
+                      ),
+                      onChanged: _stepsProvider.changeEffective,
+                    ),
+                  )
+                : AnimatedContainer(
+                    duration: Duration(milliseconds: 150),
+                    curve: Curves.easeIn,
+                  ),
             SizedBox(
               height: 10,
             ),
-            Text(
-              'Datos del Cliente:',
-              style: AppTheme.caption.copyWith(fontSize: 20),
+            Container(
+              margin: EdgeInsets.only(bottom: 10),
+              child: Center(
+                child: Text(
+                  'Datos del Cliente:',
+                  style: AppTheme.caption.copyWith(fontSize: 20),
+                ),
+              ),
             ),
             Divider(
               color: AppTheme.primaryColor,
               thickness: 1.3,
             ),
-            SizedBox(height: 10,),
+            SizedBox(
+              height: 10,
+            ),
             Row(
 //              width: size.width,
               children: [
                 Icon(Icons.map),
-                SizedBox(width: 14,),
+                SizedBox(
+                  width: 14,
+                ),
                 Expanded(
-                  child: DropdownButton(
-                    isExpanded: true,
-                    value: _direction,
-                    items: [
-                      DropdownMenuItem(
-                        child: Text('Seleccione una dirección frecuente'),
-                        value: 0,
-                      ),
-                      DropdownMenuItem(
-                        child: Text('Direccion 1'),
-                        value: 1,
-                      ),
-                      DropdownMenuItem(
-                        child: Text('Direccion 2'),
-                        value: 2,
-                      ),
-                      DropdownMenuItem(
-                        child: Text('Direccion 3'),
-                        value: 3,
-                      ),
-                    ],
-                    onChanged: (int value) {
-                      print(value);
-                      setState(() {
-                        _direction = value;
-                      });
-                    }),
-                )],
+                  child: StreamBuilder(
+                    stream: _stepsProvider.userDirectionsStream,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<Map<String, Address>>>
+                            asyncSnapshot) {
+                      if (!asyncSnapshot.hasData) {
+                        return DropdownButton(
+                            isExpanded: true,
+                            value: 0,
+                            items: [
+                              DropdownMenuItem(
+                                child: Text('Direcciones frecuentes'),
+                                value: 0,
+                              ),
+                            ],
+                            onChanged: (int value) {});
+                      } else {
+                        final addresses = asyncSnapshot.data;
+
+                        final addressesList = [
+                          DropdownMenuItem(
+                            child: Text('Seleccione una dirección frecuente'),
+                            value: "00",
+                          )
+                        ];
+                        addresses.forEach((element) {
+                          element.forEach((key, value) {
+                            addressesList.add(DropdownMenuItem(
+                              child: Text(
+                                  "${value.direction}-${value.departament} - ${value.province} - ${value.district} (${value.reference})"),
+                              value: key,
+                            ));
+                          });
+                        });
+
+                        return DropdownButton(
+                          style: TextStyle(
+//                            height: 3.0,
+                            color: AppTheme.nearlyBlack,
+//                            fontFamily:
+                          ),
+                            isExpanded: true,
+                            value: _stepsProvider.addressFrecuentlySelected,
+                            items: addressesList,
+                            onChanged: (String value) {
+                              _stepsProvider.changeAddressFrecuently(value);
+                            });
+                      }
+                    },
+                  ),
+                )
+              ],
             ),
             SizedBox(
               height: 10,
@@ -98,17 +154,15 @@ class _UserReferencePageState extends State<UserReferencePage> {
 //               padding: EdgeInsets.symmetric(horizontal: 5.0),
               child: TextField(
                 maxLines: 1,
-                // controller: _textEditingController,
+                controller: _stepsProvider.addressController,
+                autofocus: false,
                 decoration: InputDecoration(
+                  errorText: _stepsProvider.addressEntered.error,
                   icon: Icon(Icons.place),
                   labelText: 'Dirección',
                   helperText: 'Dirección de entrega',
                 ),
-                onChanged: (String value) {
-                  if (value.length > 0) {
-                    // _setUserName(value);
-                  }
-                },
+//                onChanged: _stepsProvider.changeAddress,
               ),
             ),
             SizedBox(
@@ -119,17 +173,15 @@ class _UserReferencePageState extends State<UserReferencePage> {
               child: TextField(
                 // controller: _textEditingController,
                 keyboardType: TextInputType.phone,
+                autofocus: false,
                 maxLength: 9,
                 decoration: InputDecoration(
+                  errorText: _stepsProvider.phoneEntered.error,
                   icon: Icon(Icons.phone),
                   labelText: 'Teléfono',
                   helperText: 'Telefono de contacto',
                 ),
-                onChanged: (String value) {
-                  if (value.length > 0) {
-                    // _setUserName(value);
-                  }
-                },
+                onChanged: _stepsProvider.changePhone,
               ),
             ),
             SizedBox(
@@ -138,17 +190,15 @@ class _UserReferencePageState extends State<UserReferencePage> {
             Container(
               // padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: TextField(
-                // controller: _textEditingController,
+                controller: _stepsProvider.referenceController,
+                autofocus: false,
                 decoration: InputDecoration(
+                  errorText: _stepsProvider.referenceEntered.error,
                   icon: Icon(Icons.swap_calls),
                   labelText: 'Referencia Domicilio',
                   helperText: 'Referencia de entrega',
                 ),
-                onChanged: (String value) {
-                  if (value.length > 0) {
-                    // _setUserName(value);
-                  }
-                },
+//                onChanged: _stepsProvider.changeReference,
               ),
             ),
             SizedBox(
@@ -156,16 +206,21 @@ class _UserReferencePageState extends State<UserReferencePage> {
             ),
             Row(
               children: <Widget>[
-                Icon(Icons.directions),
+                Icon(
+                  Icons.directions,
+                  color: (_stepsProvider.departamentSelected != '0')
+                      ? Colors.grey
+                      : Colors.redAccent,
+                ),
                 SizedBox(
                   width: 14,
                 ),
                 Expanded(
                   child: StreamBuilder(
                     stream: _stepsProvider.departamentsStream,
-                    builder: (BuildContext context, AsyncSnapshot<List<Departament>> asyncSnapShot) {
-
-                      if(!asyncSnapShot.hasData) {
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<Departament>> asyncSnapShot) {
+                      if (!asyncSnapShot.hasData) {
                         return DropdownButton(
                             isExpanded: true,
                             value: "0",
@@ -175,10 +230,8 @@ class _UserReferencePageState extends State<UserReferencePage> {
                                 value: "0",
                               )
                             ],
-                            onChanged: (Object value) {
-                            });
-                      }else {
-
+                            onChanged: (Object value) {});
+                      } else {
                         final departaments = asyncSnapShot.data;
 
                         final departamentsList = [
@@ -189,12 +242,10 @@ class _UserReferencePageState extends State<UserReferencePage> {
                         ];
 
                         departaments.forEach((element) {
-                          departamentsList.add(
-                              DropdownMenuItem(
-                                child: Text(element.name),
-                                value: element.ucode.toString(),
-                              )
-                          );
+                          departamentsList.add(DropdownMenuItem(
+                            child: Text(element.name),
+                            value: element.ucode.toString(),
+                          ));
                         });
 
                         return DropdownButton(
@@ -205,9 +256,7 @@ class _UserReferencePageState extends State<UserReferencePage> {
                               _stepsProvider.departamentSelected = value;
                             });
                       }
-
                     },
-
                   ),
                 )
               ],
@@ -218,15 +267,21 @@ class _UserReferencePageState extends State<UserReferencePage> {
             Row(
 //              width: size.width,
               children: [
-                Icon(Icons.directions),
+                Icon(
+                  Icons.directions,
+                  color: (_stepsProvider.provinceSelected != '0')
+                      ? Colors.grey
+                      : Colors.redAccent,
+                ),
                 SizedBox(
                   width: 14,
                 ),
                 Expanded(
                   child: StreamBuilder(
                     stream: _stepsProvider.provincesStream,
-                    builder: (BuildContext context, AsyncSnapshot<List<Province>> asyncSnapshot){
-                      if(!asyncSnapshot.hasData) {
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<Province>> asyncSnapshot) {
+                      if (!asyncSnapshot.hasData) {
                         return DropdownButton(
                             isExpanded: true,
                             value: 0,
@@ -236,9 +291,8 @@ class _UserReferencePageState extends State<UserReferencePage> {
                                 value: 0,
                               ),
                             ],
-                            onChanged: (int value) {
-                            });
-                      }else {
+                            onChanged: (int value) {});
+                      } else {
                         final provinces = asyncSnapshot.data;
 
                         final provincesList = [
@@ -249,12 +303,10 @@ class _UserReferencePageState extends State<UserReferencePage> {
                         ];
 
                         provinces.forEach((element) {
-                          provincesList.add(
-                              DropdownMenuItem(
-                                child: Text(element.name),
-                                value: element.ucode.toString(),
-                              )
-                          );
+                          provincesList.add(DropdownMenuItem(
+                            child: Text(element.name),
+                            value: element.ucode.toString(),
+                          ));
                         });
 
                         return DropdownButton(
@@ -264,7 +316,6 @@ class _UserReferencePageState extends State<UserReferencePage> {
                             onChanged: (String value) {
                               _stepsProvider.provinceSelected = value;
                             });
-
                       }
                     },
                   ),
@@ -277,15 +328,21 @@ class _UserReferencePageState extends State<UserReferencePage> {
             Row(
 //              width: size.width,
               children: [
-                Icon(Icons.directions),
+                Icon(
+                  Icons.directions,
+                  color: (_stepsProvider.districtSelected != '0')
+                      ? Colors.grey
+                      : Colors.redAccent,
+                ),
                 SizedBox(
                   width: 14,
                 ),
                 Expanded(
                   child: StreamBuilder(
                     stream: _stepsProvider.districtsStream,
-                    builder: (BuildContext context, AsyncSnapshot<List<District>> asyncSnapshot){
-                      if(!asyncSnapshot.hasData) {
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<District>> asyncSnapshot) {
+                      if (!asyncSnapshot.hasData) {
                         return DropdownButton(
                             isExpanded: true,
                             value: 0,
@@ -295,13 +352,8 @@ class _UserReferencePageState extends State<UserReferencePage> {
                                 value: 0,
                               ),
                             ],
-                            onChanged: (int value) {
-                              print(value);
-                              setState(() {
-                                _direction = value;
-                              });
-                            });
-                      }else {
+                            onChanged: (int value) {});
+                      } else {
                         final districts = asyncSnapshot.data;
 
                         final districtsList = [
@@ -312,12 +364,10 @@ class _UserReferencePageState extends State<UserReferencePage> {
                         ];
 
                         districts.forEach((element) {
-                          districtsList.add(
-                              DropdownMenuItem(
-                                child: Text(element.name),
-                                value: element.ucode.toString(),
-                              )
-                          );
+                          districtsList.add(DropdownMenuItem(
+                            child: Text(element.name),
+                            value: element.ucode.toString(),
+                          ));
                         });
 
                         return DropdownButton(
@@ -366,7 +416,8 @@ class _PaymentOptions extends StatelessWidget {
     Key key,
     @required this.size,
     @required StepsProvider stepsProvider,
-  }) : _stepsProvider = stepsProvider, super(key: key);
+  })  : _stepsProvider = stepsProvider,
+        super(key: key);
 
   final Size size;
   final StepsProvider _stepsProvider;
@@ -399,4 +450,3 @@ class _PaymentOptions extends StatelessWidget {
     );
   }
 }
-

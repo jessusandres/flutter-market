@@ -42,7 +42,6 @@ class _CartPageState extends State<CartPage> {
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                       child: Container(
-                        height: 25,
                         child: Text(
                           'Hola ${_userPreferences.userFullName} este es tu carrito en $storeName: ',
                           style: AppTheme.title,
@@ -108,6 +107,7 @@ class _CartContainer extends StatelessWidget {
             text: cart[index].cartItemAmmount.toString());
 
         return Container(
+          margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
           child: Slidable(
             actionPane: SlidableScrollActionPane (),
             actionExtentRatio: 0.20,
@@ -146,7 +146,6 @@ class _CartContainer extends StatelessWidget {
                       builder: (BuildContext context) {
                         final CartProvider _scartProvider =
                         Provider.of<CartProvider>(context);
-
                         return AlertDialog(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),

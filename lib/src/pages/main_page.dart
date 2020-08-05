@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gustolact/src/custom_drawer/home_drawer.dart';
 import 'package:gustolact/src/navigators/home_navigator.dart';
-import 'package:gustolact/src/providers/login_provider.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/widgets/appbar_widget.dart';
 import 'package:gustolact/src/widgets/drawer_widget.dart';
@@ -33,11 +32,14 @@ class _MainPageState extends State<MainPage>
       _navigatorKeys[_selectedIndex]
           .currentState
           .pop(_navigatorKeys[_selectedIndex].currentContext);
+      return Future.value(true);
     } else {
       if (_mainProvider.indexPage == 0) {
         SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop');
+        return Future.value(false);
       } else {
         _mainProvider.indexPage = 0;
+        return Future.value(false);
       }
     }
   }
@@ -69,28 +71,11 @@ class _MainPageState extends State<MainPage>
       _mainProvider.homeNavigatorKey,
     ];
 
-//
-//    transitionBuilder: (Widget child, Animation<double> animation) {
-//
-//      var begin = Offset(0.3, 1.0);
-//      var end = Offset.zero;
-//      var curve = Curves.ease;
-//      var tween =
-//      Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-//
-//      return SlideTransition(
-//        position: animation.drive(tween),
-//        child: child,
-//      );
-//    }
-
-    final LoginProvider loginProvider = Provider.of<LoginProvider>(context);
 
     return AnimatedSwitcher(
         duration: Duration(milliseconds: 2400),
         transitionBuilder: (Widget child, Animation<double> animation) {
-          final begin = Offset(0.3, 1.0);
-          final end = Offset.zero;
+
           final curve = Curves.ease;
           final tween =
               Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: curve));

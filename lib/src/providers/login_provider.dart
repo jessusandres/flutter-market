@@ -126,10 +126,9 @@ class LoginProvider with ChangeNotifier {
       this._userPreferences.authToken = decode['token'];
       await this._securePreferences.setUserPassword(fpassword);
 
-      //TODO CAMBIAR NOMBRE
+
       this.expirationDate = expirationDate;
       this.isLogged = true;
-
       return true;
     }
 

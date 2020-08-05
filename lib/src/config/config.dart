@@ -18,3 +18,5 @@ String storeUrlAPI = 'https://tuquepides.com/api/store/$urlStore';
 
 //String baseUrlAPI = 'http://192.168.1.4:3100';
 String baseUrlAPI = 'https://tuquepides.com/api';
+
+String publicCulquiKey  = 'pk_test_9fb7c16dc0ed24f5';

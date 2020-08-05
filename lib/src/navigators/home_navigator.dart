@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gustolact/src/pages/home_page.dart';
 import 'package:gustolact/src/pages/unavaliable_page.dart';
-import 'package:gustolact/src/providers/login_provider.dart';
 import 'package:gustolact/src/providers/main_provider.dart';
 import 'package:gustolact/src/widgets/appbar_widget.dart';
 import 'package:gustolact/src/widgets/drawer_widget.dart';

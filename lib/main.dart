@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/config/key.dart';
@@ -49,7 +48,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         theme: AppTheme.lightTheme.copyWith(
-          textTheme: GoogleFonts.muliTextTheme(
+          textTheme: GoogleFonts.latoTextTheme(
             Theme.of(context).textTheme,
           ),
         ),

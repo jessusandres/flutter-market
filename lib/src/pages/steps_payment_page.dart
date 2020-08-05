@@ -5,22 +5,16 @@ import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/widgets/appbar_payment_widget.dart';
 import 'package:provider/provider.dart';
 
-import 'checkout/user_reference_page.dart';
-
 class StepsPaymentPage extends StatefulWidget {
   @override
   _StepsPaymentPageState createState() => _StepsPaymentPageState();
 }
 
 class _StepsPaymentPageState extends State<StepsPaymentPage> {
-  List _forms;
 
   @override
   Widget build(BuildContext context) {
-    _forms = [
-      UserReferencePage(),
-      Step2Container(),
-    ];
+
 
     return Scaffold(
         appBar: AppBarPayment(),
@@ -30,13 +24,16 @@ class _StepsPaymentPageState extends State<StepsPaymentPage> {
             ChangeNotifierProvider<StepsProvider>(create: (_) => new StepsProvider(),),
           ],
           child: Builder(builder: (BuildContext context) {
+
+            final StepsProvider stepsProvider = Provider.of<StepsProvider>(context);
+
             return Container(
               color: AppTheme.nearlyWhite,
               child: Column(
                 children: [
-                  _StepsContainer(ammount: _forms.length),
+                  _StepsContainer(ammount: stepsProvider.listForms.length),
                   Expanded(
-                    child: _PageViewSteps(forms: _forms),
+                    child: _PageViewSteps(),
                   ),
                 ],
               ),
@@ -49,11 +46,7 @@ class _StepsPaymentPageState extends State<StepsPaymentPage> {
 
 
 class _PageViewSteps extends StatefulWidget {
-  const _PageViewSteps({
-    @required List forms,
-  }) : _forms = forms;
 
-  final List _forms;
 
   @override
   __PageViewStepsState createState() => __PageViewStepsState();
@@ -65,8 +58,20 @@ class __PageViewStepsState extends State<_PageViewSteps> {
   @override
   void initState() {
     _pageViewController.addListener(() {
-      Provider.of<NumberProvider>(context, listen: false).currentIndex =
-          _pageViewController.page;
+
+      final allow = Provider.of<StepsProvider>(context, listen: false).getValidations();
+      print(allow);
+      if(allow) {
+        Provider.of<NumberProvider>(context, listen: false).currentIndex =
+            _pageViewController.page;
+      }else {
+
+        setState(() {
+          _pageViewController.animateToPage(0,duration: Duration(milliseconds: 250), curve: Curves.easeIn);
+        });
+      }
+
+
     });
     super.initState();
   }
@@ -95,12 +100,13 @@ class __PageViewStepsState extends State<_PageViewSteps> {
 
   @override
   Widget build(BuildContext context) {
+    final StepsProvider stepsProvider = Provider.of<StepsProvider>(context);
     return PageView.builder(
         controller: _pageViewController,
         physics: BouncingScrollPhysics(),
-        itemCount: widget._forms.length,
+        itemCount: stepsProvider.listForms.length,
         itemBuilder: (BuildContext context, int index) {
-          return _willPopPage(page: widget._forms[index]);
+          return _willPopPage(page: stepsProvider.listForms[index]);
         });
   }
 
@@ -112,16 +118,7 @@ class __PageViewStepsState extends State<_PageViewSteps> {
   }
 }
 
-class Step2Container extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Center(
-        child: Text('2'),
-      ),
-    );
-  }
-}
+
 
 class _StepsContainer extends StatelessWidget {
   final int ammount;

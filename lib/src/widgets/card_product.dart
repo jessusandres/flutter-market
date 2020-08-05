@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gustolact/src/config/config.dart';
-import 'package:gustolact/src/config/key.dart';
 import 'package:gustolact/src/models/image_model.dart';
 import 'package:gustolact/src/models/product_model.dart';
 import 'package:gustolact/src/pages/product_detail_page.dart';
