@@ -10,31 +10,39 @@ import 'package:gustolact/src/options/payment_options.dart';
 import 'package:gustolact/src/pages/checkout/card_payment.dart';
 import 'package:gustolact/src/pages/checkout/payment_resume.dart';
 import 'package:gustolact/src/pages/checkout/user_reference_page.dart';
+import 'package:gustolact/src/providers/cart_provider.dart';
+import 'package:gustolact/src/providers/login_provider.dart';
 import 'package:gustolact/src/shared_preferences/user_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:rxdart/rxdart.dart';
 
 class StepsProvider with ChangeNotifier {
+
+  final CartProvider _cartProvider = CartProvider();
+  final LoginProvider _loginProvider = LoginProvider();
+
   final UserPreferences _userPreferences = new UserPreferences();
 
+  final RegExp regExp = new RegExp(emailPattern);
+
   BehaviorSubject<List<Departament>> _allDepartamentsController =
-      new BehaviorSubject<List<Departament>>();
+  new BehaviorSubject<List<Departament>>();
 
   Stream<List<Departament>> get departamentsStream =>
       _allDepartamentsController.stream;
 
   BehaviorSubject<List<Province>> _allProvincesController =
-      new BehaviorSubject<List<Province>>();
+  new BehaviorSubject<List<Province>>();
 
   Stream<List<Province>> get provincesStream => _allProvincesController.stream;
 
   BehaviorSubject<List<District>> _allDistrictsController =
-      new BehaviorSubject<List<District>>();
+  new BehaviorSubject<List<District>>();
 
   Stream<List<District>> get districtsStream => _allDistrictsController.stream;
 
   BehaviorSubject<List<Map<String, Address>>> _userDirectionsController =
-      new BehaviorSubject<List<Map<String, Address>>>();
+  new BehaviorSubject<List<Map<String, Address>>>();
 
   Stream<List<Map<String, Address>>> get userDirectionsStream =>
       _userDirectionsController.stream;
@@ -45,13 +53,24 @@ class StepsProvider with ChangeNotifier {
     _allProvincesController.close();
     _allDistrictsController.close();
     _userDirectionsController.close();
+    _loadingOptionsController.close();
+
+    //INPUTS
+    emailController.dispose();
+    phoneController.dispose();
+    effectiveController.dispose();
+    referenceController.dispose();
+    addressController.dispose();
     super.dispose();
   }
 
-  void getUserDirections() async {
+  Future<dynamic> getUserDirections() async {
     final url =
-        "$baseUrlAPI/user/${_userPreferences.userCode}/directions?token=${_userPreferences.authToken}";
+        "$baseUrlAPI/user/${_userPreferences
+        .userCode}/directions?token=${_userPreferences.authToken}";
+//    print(url);
     final res = await http.get(url);
+//    print(res.body);
     final userAddressesData = userAddressesFromJson(res.body);
     final userAddresses = userAddressesData.addresses;
     final List<Map<String, Address>> mList = [];
@@ -61,6 +80,7 @@ class StepsProvider with ChangeNotifier {
     });
 
     _userDirectionsController.sink.add(mList);
+    return true;
   }
 
   Future<bool> getAllDepartaments() async {
@@ -86,8 +106,10 @@ class StepsProvider with ChangeNotifier {
     final url =
         "$baseUrlAPI/$departamentSelected/$provinceCode/districts?auth=$globalToken";
     final res = await http.get(url);
+
     final data = dIstrictsModelFromJson(res.body);
     final districts = data.districts;
+//    print("dis res: ${res.body}");
     _allDistrictsController.sink.add(districts);
     return true;
   }
@@ -115,9 +137,9 @@ class StepsProvider with ChangeNotifier {
 
   String get provinceSelected => this._provinceSelected;
 
-  set provinceSelected(String value) {
+  void changeProvince(String value, {bool charge = true}) {
     this._provinceSelected = value;
-    this.getAllDistricts(value);
+    if (charge) this.getAllDistricts(value);
     notifyListeners();
   }
 
@@ -131,7 +153,6 @@ class StepsProvider with ChangeNotifier {
   }
 
   PaymentOptions _paymentOptionSelected = PaymentOptions.efective;
-
   PaymentOptions get paymentOptionSelected => this._paymentOptionSelected;
 
   set paymentOptionSelected(PaymentOptions value) {
@@ -145,18 +166,46 @@ class StepsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  ValidationItem _effectiveEntered = new ValidationItem(null, null);
+  TextEditingController emailController = new TextEditingController();
+  ValidationItem _emailEntered = new ValidationItem(null, null);
+  ValidationItem get emailEntered => this._emailEntered;
 
+  void changeEmail(String payEmail) {
+
+    if(payEmail == null) {
+      this._emailEntered = ValidationItem(null, 'Email incorrecto');
+      notifyListeners();
+      return;
+    }
+
+    if (regExp.hasMatch(payEmail)) {
+      this._emailEntered = ValidationItem(payEmail, null);
+    } else {
+      this._emailEntered = ValidationItem(null, 'Email incorrecto');
+    }
+    notifyListeners();
+  }
+
+  TextEditingController effectiveController = new TextEditingController();
+  ValidationItem _effectiveEntered = new ValidationItem(null, null);
   ValidationItem get effectiveEntered => this._effectiveEntered;
 
   void changeEffective(String value) {
-    // TODO : MONTO TOTAL COGER
-    print("veri: $value");
-    if (double.parse(value) > 20) {
-      this._effectiveEntered = ValidationItem(value, null);
+//    print("veri: $value");
+//    print("total cart: ${_cartProvider.totalCart}");
+
+    if (value == null) {
+      this._effectiveEntered = ValidationItem(
+          '0.0', 'Monto incorrecto, mínimo: ${_cartProvider.totalCart}');
     } else {
-      this._effectiveEntered = ValidationItem('0.0', 'Monto incorrecto');
+      if (double.parse(value) > _cartProvider.totalCart) {
+        this._effectiveEntered = ValidationItem(value, null);
+      } else {
+        this._effectiveEntered = ValidationItem(
+            '0.0', 'Monto incorrecto, mínimo: ${_cartProvider.totalCart}');
+      }
     }
+
     notifyListeners();
   }
 
@@ -165,13 +214,9 @@ class StepsProvider with ChangeNotifier {
   String get addressFrecuentlySelected => this._addressFrecuentlySelected;
 
   void changeAddressFrecuently(String selected) async {
-
-
+    _allProvincesController.sink.add(null);
+    _allDistrictsController.sink.add(null);
     this._addressFrecuentlySelected = selected;
-
-//    this._departamentSelected = "00";
-//    this._provinceSelected = "00";
-//    this._districtSelected = "00";
 
     _userDirectionsController.value.forEach((element) {
       element.forEach((key, address) {
@@ -179,30 +224,37 @@ class StepsProvider with ChangeNotifier {
           this.addressController.text = address.direction;
           this.referenceController.text = address.reference;
 
-          _allDepartamentsController.value.forEach((dpt) async {
+          _allDepartamentsController.value.forEach((dpt) {
             if (dpt.name == address.departament) {
               this.departamentSelected = dpt.ucode;
-              await this.getAllProvinces(dpt.ucode);
-
-              _allProvincesController.value.forEach((prv) async {
-                if (prv.name == address.province) {
-                  this.provinceSelected = prv.ucode;
-                  await this.getAllDistricts(prv.ucode);
-
-                  _allDistrictsController.value.forEach((dist) async{
-                    if (dist.name == address.district) {
-                      this.districtSelected = dist.ucode;
-                    }
-                  });
-                }
+              this.getAllProvinces(dpt.ucode)
+                  .then((_) =>
+              {
+                _allProvincesController.value.forEach((prov) {
+                  if (prov.name.trim() == address.province.trim()) {
+//                    this.provinceSelected = prov.ucode;
+                    this.getAllDistricts(prov.ucode)
+                        .then((_) {
+                      for (final dist in _allDistrictsController.value) {
+//                        print(dist.name);
+                        if (dist.name.trim() == address.district.trim()) {
+                          this.districtSelected = dist.ucode;
+                          break;
+                        }
+                      }
+                    });
+                    this.changeProvince(prov.ucode, charge: false);
+                    return;
+                  }
+                })
               });
             }
           });
         }
       });
     });
-    print("e.e");
-    notifyListeners();
+
+//    notifyListeners();
   }
 
   TextEditingController addressController = new TextEditingController();
@@ -211,7 +263,9 @@ class StepsProvider with ChangeNotifier {
   ValidationItem get addressEntered => this._addressEntered;
 
   void changeAddress(String value) {
-    if (value.trim().length > 5) {
+    if (value
+        .trim()
+        .length > 5) {
       this._addressEntered = ValidationItem(value, null);
     } else {
       this._addressEntered = ValidationItem(null, 'Dirección incorrecta');
@@ -220,15 +274,24 @@ class StepsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  TextEditingController phoneController = new TextEditingController();
   ValidationItem _phoneEntered = new ValidationItem(null, null);
 
   ValidationItem get phoneEntered => this._phoneEntered;
 
   void changePhone(String value) {
-    if (value.trim().length == 9 || value.trim().length == 6) {
-      this._phoneEntered = ValidationItem(value, null);
-    } else {
+    if (value == null) {
       this._phoneEntered = ValidationItem(null, 'Teléfono incorrecto');
+    } else {
+      if (value
+          .trim()
+          .length == 9 || value
+          .trim()
+          .length == 6) {
+        this._phoneEntered = ValidationItem(value, null);
+      } else {
+        this._phoneEntered = ValidationItem(null, 'Teléfono incorrecto');
+      }
     }
 
     notifyListeners();
@@ -240,7 +303,9 @@ class StepsProvider with ChangeNotifier {
   ValidationItem get referenceEntered => this._referenceEntered;
 
   void changeReference(String value) {
-    if (value.trim().length > 10) {
+    if (value
+        .trim()
+        .length > 10) {
       this._referenceEntered = ValidationItem(value, null);
     } else {
       this._referenceEntered = ValidationItem(null, 'Referencia incorrecta');
@@ -257,10 +322,7 @@ class StepsProvider with ChangeNotifier {
   }
 
   bool getValidations() {
-//    print("v: ${this._effectiveEntered.value}");
-//    print("v2: ${this.paymentOptionSelected}");
-//    print(
-//        "vf: ${(this.paymentOptionSelected == PaymentOptions.efective && this._effectiveEntered.value != '0.0')}");
+
     if (this._addressEntered.value != null &&
         this._phoneEntered.value != null &&
         this._referenceEntered.value != null &&
@@ -268,12 +330,15 @@ class StepsProvider with ChangeNotifier {
         this.provinceSelected != '0' &&
         this.districtSelected != '0') {
       if (this.paymentOptionSelected == PaymentOptions.efective &&
-          this._effectiveEntered.value == '0.0') {
+          (this._effectiveEntered.value == '0.0' ||
+              this._effectiveEntered.value == null)) {
+        this.changeEffective("0.0");
         return false;
       }
 
       return true;
     } else {
+//      print("p ${this._phoneEntered.value}");
       (this._phoneEntered.value == null)
           ? this.changePhone('')
           : this.changePhone(this._phoneEntered.value);
@@ -287,8 +352,8 @@ class StepsProvider with ChangeNotifier {
           : this.changeReference(this._referenceEntered.value);
 
       (this.paymentOptionSelected == PaymentOptions.efective &&
-              (this.effectiveEntered.value == '0.0' ||
-                  this.effectiveEntered.value == null))
+          (this.effectiveEntered.value == '0.0' ||
+              this.effectiveEntered.value == null))
           ? this.changeEffective('0.0')
           : this.changeEffective(this._effectiveEntered.value);
 
@@ -296,35 +361,129 @@ class StepsProvider with ChangeNotifier {
     }
   }
 
+  bool getAllValidations() {
+    final validation1 = this.getValidations();
+    if(validation1 && this.emailEntered.value != null) {
+      return true;
+    }else {
+      this.changeEmail(this.emailEntered.value);
+      return false;
+    }
+  }
+
   void addressListener() {
     addressController.addListener(() {
       final value = addressController.text;
-      if (value.trim().length > 5) {
+      if (value
+          .trim()
+          .length > 5) {
         this._addressEntered = ValidationItem(value, null);
       } else {
         this._addressEntered = ValidationItem(null, 'Dirección incorrecta');
-        notifyListeners();
       }
+      notifyListeners();
     });
   }
 
   void referenceListener() {
     referenceController.addListener(() {
       final value = referenceController.text;
-      if (value.trim().length > 10) {
+      if (value
+          .trim()
+          .length > 10) {
         this._referenceEntered = ValidationItem(value, null);
       } else {
         this._referenceEntered = ValidationItem(null, 'Referencia incorrecta');
-        notifyListeners();
       }
+      notifyListeners();
     });
   }
 
-  StepsProvider() {
+  void phoneListener() {
+    phoneController.addListener(() {
+      final value = phoneController.text;
+      if (value
+          .trim()
+          .length == 9 || value
+          .trim()
+          .length == 6) {
+        this._phoneEntered = ValidationItem(value, null);
+      } else {
+        this._phoneEntered = ValidationItem(null, 'Teléfono incorrecto');
+      }
+      notifyListeners();
+    });
+  }
+
+  void effectiveListener() {
+    effectiveController.addListener(() {
+      final value = effectiveController.text;
+      if (value == null) {
+        this._effectiveEntered = ValidationItem(
+            '0.0', 'Monto incorrecto, mínimo: ${_cartProvider.totalCart}');
+      } else {
+        if (double.parse(value) > _cartProvider.totalCart) {
+          this._effectiveEntered = ValidationItem(value, null);
+        } else {
+          this._effectiveEntered = ValidationItem(
+              '0.0', 'Monto incorrecto, mínimo: ${_cartProvider.totalCart}');
+        }
+      }
+      notifyListeners();
+    });
+  }
+
+  void emailListener() {
+    emailController.addListener(() {
+      final payEmail = emailController.text;
+
+        if (regExp.hasMatch(payEmail)) {
+          this._emailEntered = ValidationItem(payEmail, null);
+        } else {
+          this._emailEntered = ValidationItem(null, 'Email incorrecto 0');
+        }
+      notifyListeners();
+    });
+  }
+
+  StreamController<bool> _loadingOptionsController = BehaviorSubject<bool>();
+
+  Stream<bool> get loadingStream => this._loadingOptionsController.stream;
+
+  void setLoading(bool value) {
+    _loadingOptionsController.sink.add(value);
+  }
+
+  void setInputListeners() {
     addressListener();
     referenceListener();
+    phoneListener();
+    effectiveListener();
+    emailListener();
 
-    this.getUserDirections();
-    this.getAllDepartaments();
+  }
+
+  StepsProvider() {
+
+    setLoading(true);
+
+    setInputListeners();
+
+    Future.wait([getUserDirections(),getAllDepartaments(),_loginProvider.verifyLogin()])
+    .then((_){
+//      print("verificacion completa");
+      this._loginProvider.setUserData().then((_) {
+//        print("user data completa");
+        phoneController.text = _userPreferences.userPhone;
+        emailController.text = _userPreferences.userEmail;
+        this._cartProvider.getCart()
+            .then((_){
+//          print("get cart complete");
+          setLoading(false);
+        });
+      });
+    });
+
+
   }
 }

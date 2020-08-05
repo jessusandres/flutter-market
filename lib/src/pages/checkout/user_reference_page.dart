@@ -52,6 +52,7 @@ class _UserReferencePageState extends State<UserReferencePage> {
                     child: TextField(
                       maxLines: 1,
                       autofocus: false,
+                      controller: _stepsProvider.effectiveController,
                       keyboardType:
                           TextInputType.numberWithOptions(decimal: true),
                       decoration: InputDecoration(
@@ -60,7 +61,7 @@ class _UserReferencePageState extends State<UserReferencePage> {
                         labelText: 'Monto de Efectivo',
                         helperText: 'Monto de Efectivo para pagar',
                       ),
-                      onChanged: _stepsProvider.changeEffective,
+//                      onChanged: _stepsProvider.changeEffective,
                     ),
                   )
                 : AnimatedContainer(
@@ -171,7 +172,7 @@ class _UserReferencePageState extends State<UserReferencePage> {
             Container(
               // padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: TextField(
-                // controller: _textEditingController,
+                 controller: _stepsProvider.phoneController,
                 keyboardType: TextInputType.phone,
                 autofocus: false,
                 maxLength: 9,
@@ -181,7 +182,7 @@ class _UserReferencePageState extends State<UserReferencePage> {
                   labelText: 'Teléfono',
                   helperText: 'Telefono de contacto',
                 ),
-                onChanged: _stepsProvider.changePhone,
+//                onChanged: _stepsProvider.changePhone,
               ),
             ),
             SizedBox(
@@ -314,7 +315,7 @@ class _UserReferencePageState extends State<UserReferencePage> {
                             value: _stepsProvider.provinceSelected,
                             items: provincesList,
                             onChanged: (String value) {
-                              _stepsProvider.provinceSelected = value;
+                              _stepsProvider.changeProvince(value);
                             });
                       }
                     },

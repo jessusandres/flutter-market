@@ -47,6 +47,14 @@ class UserPreferences {
     this._preferences.setString("rm_usercode", code);
   }
 
+  get userPhone{
+    return this._preferences.get("rm_userphone");
+  }
+
+  set userPhone(String phone) {
+    this._preferences.setString("rm_userphone", phone);
+  }
+
 
   get all => this._preferences.getKeys();
 

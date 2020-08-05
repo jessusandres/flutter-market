@@ -2,15 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/config/config.dart';
+import 'package:gustolact/src/models/userdata_model.dart';
 import 'package:gustolact/src/models/validation_model.dart';
 import 'package:gustolact/src/secure_preferences/secure_preferences.dart';
 import 'package:gustolact/src/shared_preferences/user_preferences.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:http/http.dart' as http;
 
-
 class LoginProvider with ChangeNotifier {
-
   UserPreferences _userPreferences;
   SecurePreferences _securePreferences;
 
@@ -44,7 +43,7 @@ class LoginProvider with ChangeNotifier {
     _userPreferences = new UserPreferences();
     _securePreferences = new SecurePreferences();
     print('==LOGIN PROVIDER IS INIT==');
-    this.verifyLogin();
+//    this.verifyLogin();
   }
 
   reset() {
@@ -61,6 +60,37 @@ class LoginProvider with ChangeNotifier {
     this.isLogged = false;
   }
 
+  noneF() {
+
+  }
+
+  Future<dynamic> setUserData() async {
+    final url =
+        "$baseUrlAPI/user/${_userPreferences.userCode}?token=${_userPreferences.authToken}";
+    final res = await http.get(url);
+    final UserDataModel userDataModel = userDataModelFromJson(res.body);
+    final userData = userDataModel.user;
+//    print("p1 ${userData.phone1}");
+//    print("p2 ${userData.phone2}");
+//    print("p3 ${userData.phone3}");
+    if (userData.phone1 == null) {
+      if (userData.phone2 == null) {
+        if (userData.phone3 != null)
+          (userData.phone3.trim().length > 0)
+              ? this._userPreferences.userPhone = userData.phone3
+              : noneF();
+      } else {
+        (userData.phone2.trim().length > 0)
+            ? this._userPreferences.userPhone = userData.phone2
+            : noneF();
+      }
+    } else {
+      (userData.phone1.trim().length > 0)
+          ? this._userPreferences.userPhone = userData.phone1
+          : noneF();
+    }
+  }
+
   Future<dynamic> loginUser() async {
     if (this.email == null || this.password == null) return;
 
@@ -73,10 +103,10 @@ class LoginProvider with ChangeNotifier {
     final decode = jsonDecode(res.body);
 
     if (decode['ok'] == true) {
-      
       final payload = Jwt.parseJwt(decode['token']);
 
-      final _fullname = "${payload['user']['userName']} ${payload['user']['userLastname']}";
+      final _fullname =
+          "${payload['user']['userName']} ${payload['user']['userLastname']}";
       final _userCode = payload['user']['userCode'];
 
       final expirationDate = payload['exp'];
@@ -103,7 +133,6 @@ class LoginProvider with ChangeNotifier {
   }
 
   Future<bool> _loginExpiration(String femail, String fpassword) async {
-
     if (femail == null || fpassword == null) {
       return false;
     }
@@ -118,14 +147,14 @@ class LoginProvider with ChangeNotifier {
       final payload = Jwt.parseJwt(decode['token']);
       final expirationDate = payload['exp'];
       final _userCode = payload['user']['userCode'];
-      final _fullname = "${payload['user']['userName']} ${payload['user']['userLastname']}";
+      final _fullname =
+          "${payload['user']['userName']} ${payload['user']['userLastname']}";
       // TODO : save user email and paswword in secure storage -- save token in user preferences
       this._userPreferences.userEmail = femail;
       this._userPreferences.userFullName = _fullname;
       this._userPreferences.userCode = _userCode;
       this._userPreferences.authToken = decode['token'];
       await this._securePreferences.setUserPassword(fpassword);
-
 
       this.expirationDate = expirationDate;
       this.isLogged = true;
@@ -135,7 +164,7 @@ class LoginProvider with ChangeNotifier {
     return false;
   }
 
-  verifyLogin() async {
+  Future<dynamic> verifyLogin() async {
     print('==== VERIFICATION ====');
 
     if (this._userPreferences.all != null &&
@@ -144,13 +173,6 @@ class LoginProvider with ChangeNotifier {
           this._userPreferences.userEmail != null &&
           await this._securePreferences.userPassword != null) {
 
-//        print("== DATOS EN PREFERENCES AND SECURE==");
-//        print("user: ${this._userPreferences.all}");
-//        print("token: ${this._userPreferences.authToken}");
-//        print("email: ${this._userPreferences.userEmail}");
-//        print("password: ${await this._securePreferences.userPassword}");
-//        print("== FIN DE DATOS EN PREFERENCES AND SECURE==");
-//        print(this._userPreferences.authToken);
 
         final payload = Jwt.parseJwt(this._userPreferences.authToken);
 
@@ -161,32 +183,28 @@ class LoginProvider with ChangeNotifier {
 
         final currentDate = new DateTime.now();
 
-        print("time to expired: ${date.difference(currentDate).inMinutes} minutes");
+        print(
+            "Time to expired: ${date.difference(currentDate).inMinutes} minutes");
 
         if (date.difference(currentDate).inMinutes < 20) {
-          print("refrescando token");
-
+          print("===TOKEN REFRESH===");
           this._refreshToken(this._userPreferences.authToken);
 
         } else {
-
           this.expirationDate = expirationDate;
           this._isLogged = true;
           notifyListeners();
-
         }
-
-
-      }
-      else {
+      } else {
         print("local data is empty");
         if (this._isLogged == true) {
           this._isLogged = false;
           notifyListeners();
         }
       }
-    } else {
-      print("invalid token");
+    }
+    else {
+      print("Invalid token");
       if (this._isLogged == true) {
         this._isLogged = false;
         notifyListeners();
@@ -195,7 +213,6 @@ class LoginProvider with ChangeNotifier {
   }
 
   void _refreshToken(String token) async {
-
     final verificationUrl = '$baseUrlAPI/login/verification?token=$token';
     final refreshUrl = '$baseUrlAPI/login/refreshToken?token=$token';
 
@@ -207,15 +224,13 @@ class LoginProvider with ChangeNotifier {
 
       final rfrdecoded = jsonDecode(rfrresponse.body);
 
-//      print("rfrde: $rfrdecoded");
-
-//      print("jwt: ${Jwt.parseJwt(rfrdecoded['newToken'])}");
 
       final payload = Jwt.parseJwt(rfrdecoded['newToken']);
 
       final expirationDate = payload['exp'];
       final _userCode = payload['user']['userCode'];
-      final _fullname = "${payload['user']['userName']} ${payload['user']['userLastname']}";
+      final _fullname =
+          "${payload['user']['userName']} ${payload['user']['userLastname']}";
       final _email = payload['user']['userEmail'];
 
       print(
@@ -231,16 +246,12 @@ class LoginProvider with ChangeNotifier {
 
     } else {
 
-//      print("de : $decoded");
-
       if (decoded['err']['name'] == 'TokenExpiredError') {
-//        print("refresh by expired");
 
         await this._loginExpiration(this._userPreferences.userEmail,
             await this._securePreferences.userPassword);
       } else {
-//        print('no auth');
-        // TODO : Manejo de posible incrustación de codigo
+
         this._userPreferences.clear();
         this._securePreferences.clear();
         this._isLogged = false;
@@ -262,10 +273,8 @@ class LoginProvider with ChangeNotifier {
       return;
     }
 
-    Pattern pattern =
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
 
-    RegExp regExp = new RegExp(pattern);
+    RegExp regExp = new RegExp(emailPattern);
 
     if (regExp.hasMatch(uemail)) {
       this._email = ValidationItem(uemail, null);

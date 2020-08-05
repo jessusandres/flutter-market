@@ -14,9 +14,13 @@ String globalToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYW5kcmV3I
 String storeAvatar = 'https://www.redmovildenegocios.com/Mas7er/r3dmark3t/images_tiendas/1589941295_logoInfocomp.png';
 
 String storeUrlAPI = 'https://tuquepides.com/api/store/$urlStore';
-//String storeUrlAPI = 'http://192.168.1.4:3100/store/$urlStore';
+//String storeUrlAPI = 'http://192.168.1.6:3100/store/$urlStore';
 
-//String baseUrlAPI = 'http://192.168.1.4:3100';
+//String baseUrlAPI = 'http://192.168.1.6:3100';
 String baseUrlAPI = 'https://tuquepides.com/api';
 
 String publicCulquiKey  = 'pk_test_9fb7c16dc0ed24f5';
+
+Pattern emailPattern =
+    r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+

@@ -7,7 +7,9 @@ import 'package:gustolact/src/pages/filter_page.dart';
 import 'package:gustolact/src/pages/main_page.dart';
 
 final mainRoutes = {
-  '/': (BuildContext context) => MainPage(),
+  '/': (BuildContext context) => Builder(builder: (BuildContext context) {
+    return MainPage(mainContext: context);
+  },),
   'home': (BuildContext context) => HomeNavigator(),
   'profile': (BuildContext context) => ProfilePage(),
   'cotizations': (BuildContext context) => CotizationsPage(),

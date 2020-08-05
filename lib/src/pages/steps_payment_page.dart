@@ -10,6 +10,17 @@ class StepsPaymentPage extends StatefulWidget {
   _StepsPaymentPageState createState() => _StepsPaymentPageState();
 }
 
+class _MCircular extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+}
+
 class _StepsPaymentPageState extends State<StepsPaymentPage> {
 
   @override
@@ -26,18 +37,32 @@ class _StepsPaymentPageState extends State<StepsPaymentPage> {
           child: Builder(builder: (BuildContext context) {
 
             final StepsProvider stepsProvider = Provider.of<StepsProvider>(context);
-
-            return Container(
-              color: AppTheme.nearlyWhite,
-              child: Column(
-                children: [
-                  _StepsContainer(ammount: stepsProvider.listForms.length),
-                  Expanded(
-                    child: _PageViewSteps(),
-                  ),
-                ],
-              ),
+            return StreamBuilder(
+              stream: stepsProvider.loadingStream,
+              builder: (BuildContext context, AsyncSnapshot<bool> asyncSnapshot){
+                if(!asyncSnapshot.hasData) {
+                  return _MCircular();
+                }else {
+//                  print("data: ${asyncSnapshot.data}");
+                  if(asyncSnapshot.data == true) {
+                    return _MCircular();
+                  }else {
+                    return Container(
+                      color: AppTheme.nearlyWhite,
+                      child: Column(
+                        children: [
+                          _StepsContainer(ammount: stepsProvider.listForms.length),
+                          Expanded(
+                            child: _PageViewSteps(),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                }
+              },
             );
+
           }),
         ));
   }
@@ -60,7 +85,7 @@ class __PageViewStepsState extends State<_PageViewSteps> {
     _pageViewController.addListener(() {
 
       final allow = Provider.of<StepsProvider>(context, listen: false).getValidations();
-      print(allow);
+//      print(allow);
       if(allow) {
         Provider.of<NumberProvider>(context, listen: false).currentIndex =
             _pageViewController.page;
@@ -69,6 +94,7 @@ class __PageViewStepsState extends State<_PageViewSteps> {
         setState(() {
           _pageViewController.animateToPage(0,duration: Duration(milliseconds: 250), curve: Curves.easeIn);
         });
+
       }
 
 

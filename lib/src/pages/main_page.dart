@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gustolact/src/custom_drawer/home_drawer.dart';
 import 'package:gustolact/src/navigators/home_navigator.dart';
+import 'package:gustolact/src/providers/login_provider.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/widgets/appbar_widget.dart';
 import 'package:gustolact/src/widgets/drawer_widget.dart';
@@ -13,6 +14,9 @@ import 'package:gustolact/src/widgets/bottombar_widget.dart';
 import 'package:gustolact/src/widgets/fade_in_stack.dart';
 
 class MainPage extends StatefulWidget {
+  final BuildContext mainContext;
+
+  const MainPage({@required this.mainContext});
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -51,7 +55,8 @@ class _MainPageState extends State<MainPage>
   void initState() {
     drawerIndex = DrawerIndex.HOME;
     screenView = HomeNavigator();
-
+    final LoginProvider loginProvider = Provider.of<LoginProvider>(widget.mainContext, listen: false);
+    loginProvider.verifyLogin();
     super.initState();
   }
 

@@ -76,7 +76,7 @@ class ProductProvider with ChangeNotifier {
   }
 
   Future<List<ProductModel>> refreshProducts() async {
-    print("refresh");
+//    print("refresh");
     loading = true;
 
     this._allProducts = [];

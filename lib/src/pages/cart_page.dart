@@ -16,12 +16,10 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
-
   CartProvider _cartProvider;
 
   @override
   Widget build(BuildContext context) {
-
     this._cartProvider = Provider.of<CartProvider>(context);
 
     final UserPreferences _userPreferences = new UserPreferences();
@@ -40,7 +38,8 @@ class _CartPageState extends State<CartPage> {
                   children: <Widget>[
                     Container(
                       width: double.infinity,
-                      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                       child: Container(
                         child: Text(
                           'Hola ${_userPreferences.userFullName} este es tu carrito en $storeName: ',
@@ -53,18 +52,26 @@ class _CartPageState extends State<CartPage> {
                     ),
                     Expanded(
                         child: _CartContainer(
-                          mainContext: context,
-                        )),
+                      mainContext: context,
+                    )),
+                    Container(
+                      width: double.infinity,
+                      color: AppTheme.primaryColor,
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Center(
+                          child: Text(
+                        'TOTAL EN CARRITO : ${_cartProvider.totalCart}',
+                        style: TextStyle(color: AppTheme.white),
+                      )),
+                    ),
                   ],
-                )
-        ),
+                )),
       ),
     );
   }
 }
 
 class _CartContainer extends StatelessWidget {
-
   final BuildContext mainContext;
 
   const _CartContainer({@required this.mainContext});
@@ -109,7 +116,7 @@ class _CartContainer extends StatelessWidget {
         return Container(
           margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
           child: Slidable(
-            actionPane: SlidableScrollActionPane (),
+            actionPane: SlidableScrollActionPane(),
             actionExtentRatio: 0.20,
             child: Container(
               color: AppTheme.white,
@@ -145,7 +152,7 @@ class _CartContainer extends StatelessWidget {
                       context: context,
                       builder: (BuildContext context) {
                         final CartProvider _scartProvider =
-                        Provider.of<CartProvider>(context);
+                            Provider.of<CartProvider>(context);
                         return AlertDialog(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
@@ -165,8 +172,7 @@ class _CartContainer extends StatelessWidget {
                           actions: <Widget>[
                             FlatButton(
                               onPressed: () {
-                                if (_scartProvider.tempAmmount.error !=
-                                    null) {
+                                if (_scartProvider.tempAmmount.error != null) {
                                   return;
                                 } else {
                                   Navigator.pop(context);
@@ -176,8 +182,7 @@ class _CartContainer extends StatelessWidget {
                               },
                               child: Text(
                                 'Confirmar',
-                                style:
-                                TextStyle(color: AppTheme.primaryColor),
+                                style: TextStyle(color: AppTheme.primaryColor),
                               ),
                             ),
                             FlatButton(
@@ -185,8 +190,8 @@ class _CartContainer extends StatelessWidget {
                                 Navigator.of(context).pop();
                               },
                               child: Text('Cancelar',
-                                  style: TextStyle(
-                                      color: AppTheme.primaryColor)),
+                                  style:
+                                      TextStyle(color: AppTheme.primaryColor)),
                             )
                           ],
                         );

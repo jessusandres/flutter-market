@@ -9,8 +9,13 @@ import 'package:http/http.dart' as http;
 
 class CartProvider with ChangeNotifier{
 
-  final UserPreferences _userPreferences = UserPreferences();
+  double _totalCart;
+  double get totalCart => this._totalCart;
+  set totalCart(double value) {
+    this._totalCart = value;
+  }
 
+  final UserPreferences _userPreferences = UserPreferences();
   ValidationItem _tempAmmount = new ValidationItem(null, null);
   ValidationItem get tempAmmount => this._tempAmmount;
 
@@ -60,33 +65,40 @@ class CartProvider with ChangeNotifier{
   }
 
   // FUNCTIONS
-  getCart() async {
-    print("get cart");
+  Future<dynamic>getCart() async {
+    print("==GET CART==");
     loadingCart = true;
 
     final response = await http.get("$baseUrlAPI/cart/${_userPreferences.userCode}?token=${_userPreferences.authToken}");
     final decoded = jsonDecode(response.body);
-
+//    print(decoded);
     if(decoded['ok']) {
       final cart = userCartFromJson(jsonEncode(decoded['cart']));
 
       List<UserCart> exclusiveCart = [];
 
+      double ammoutForstore = 0.0;
       cart.forEach((element) {
 
         if(element.cartStoreUrl == urlStore) {
+          final subto = element.cartItemAmmount * element.cartItemPrice;
+          ammoutForstore += subto;
           exclusiveCart.add(element);
         }
-      });
 
+      });
+      totalCart = ammoutForstore;
+//      print(totalCart);
       userCart = exclusiveCart;
+      loadingCart = false;
     }else {
       userCart = [];
+      loadingCart = false;
     }
 
-    Future.delayed(Duration(milliseconds: 200),(){
-      loadingCart = false;
-    });
+//    Future.delayed(Duration(milliseconds: 50),(){
+
+//    });
 
   }
 
