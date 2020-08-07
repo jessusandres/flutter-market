@@ -85,6 +85,7 @@ class ProductProvider with ChangeNotifier {
 
     final response = await http.get(url);
     final productsRes = jsonDecode(response.body);
+//    print(productsRes);
 
     final encoded = jsonEncode(productsRes['data']);
     this.products = productModelFromJson(encoded);

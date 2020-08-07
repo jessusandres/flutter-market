@@ -169,7 +169,8 @@ class _LoginPageState extends State<LoginPage> {
             }
           : null,
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 80.0),
+        width: double.infinity,
+        alignment: Alignment.center,
         child: Text(
           'Ingresar',
           style: TextStyle(fontSize: 17.0),
@@ -183,7 +184,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
 
   Widget _fieldsContainer(List<Widget> children, Size size) {
     return Container(
@@ -251,7 +251,9 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(height: 30),
             _passwordField(loginProvider),
             SizedBox(height: 30),
-            _buttonLogin(context)
+            Container(
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                child: _buttonLogin(context))
           ], size),
           SizedBox(
             height: 15.0,
@@ -279,8 +281,9 @@ class _LoginPageState extends State<LoginPage> {
 
       return;
     }
-    final CartProvider cartProvider = Provider.of<CartProvider>(context, listen: false);
-    if(cartProvider.loadingCart == false) {
+    final CartProvider cartProvider =
+        Provider.of<CartProvider>(context, listen: false);
+    if (cartProvider.loadingCart == false) {
       cartProvider.getCart();
     }
     Navigator.pop(context);

@@ -56,7 +56,10 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
           SizedBox(
             height: 15,
           ),
-          CulqiPayment(_widgetKey, locale: "es",),
+          CulqiPayment(
+            _widgetKey,
+            locale: "es",
+          ),
           Container(
             margin: EdgeInsets.symmetric(vertical: 5),
             padding: EdgeInsets.symmetric(horizontal: 10),
@@ -89,23 +92,44 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
   }
 
   void getToken(BuildContext context) async {
+
     CulqiCard _card = CulqiCard();
-    print(_card.cardNumber);
+
     final StepsProvider stepsProvider =
         Provider.of<StepsProvider>(context, listen: false);
     _card.email = stepsProvider.emailEntered.value;
+    final email  =_card.email;
+    bool success = _widgetKey.currentState.setInfoOn(_card);
 
-    CulqiTokenizer _tokenizer = CulqiTokenizer(_card);
+    if (success) {
 
-    final response = await _tokenizer.getToken(publicKey: publicCulquiKey);
-print(response);
-    if (response is CulqiToken) {
-      //TODO : TOKEN GENERADO:
-      print(response.token);
-    } else if (response is CulqiError) {
-      Toast.show(response.errorMessage, context,
-          duration: 3, gravity: Toast.BOTTOM);
-      print(response);
+//      print("card ${_card.cardNumber}");
+//      print("suc: $success");
+
+      CulqiTokenizer _tokenizer = CulqiTokenizer(_card);
+
+      final response = await _tokenizer.getToken(publicKey: publicCulquiKey);
+
+      if (response is CulqiToken) {
+
+//        print("token: ${response.token}");
+
+        final token = response.token;
+        print("CALL API");
+        final payResponse = await stepsProvider.generatePayment(token, email);
+
+        print(payResponse);
+
+        if(!payResponse["ok"]) {
+          Toast.show(payResponse["message"], context, duration: 3, gravity: Toast.BOTTOM);
+        }else {
+          print("payment okay");
+        }
+
+      } else if (response is CulqiError) {
+        Toast.show(response.errorMessage, context,
+            duration: 3, gravity: Toast.BOTTOM);
+      }
     }
   }
 }

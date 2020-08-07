@@ -15,6 +15,8 @@ class ListProducts extends StatelessWidget {
 
     final orientation = MediaQuery.of(context).orientation;
 
+    final size = MediaQuery.of(context).size;
+
     List<Widget> storeCards = new List();
 
     products.forEach((product) {
@@ -48,7 +50,7 @@ class ListProducts extends StatelessWidget {
                     placeholder: AssetImage('assets/gif/loading.gif'),
                     image: NetworkImage(product.getImage()),
                     fit: BoxFit.cover,
-                    height: 100.0,
+                    height: size.height * 0.14,
                   ),
                 ),
               ),
@@ -60,6 +62,8 @@ class ListProducts extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 5.3),
                     child: Text(
                       product.name,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                       style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                       textAlign: TextAlign.center,
                     ),

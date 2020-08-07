@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/models/departaments_model.dart';
@@ -105,6 +106,7 @@ class StepsProvider with ChangeNotifier {
   Future<bool> getAllDistricts(String provinceCode) async {
     final url =
         "$baseUrlAPI/$departamentSelected/$provinceCode/districts?auth=$globalToken";
+//    print(url);
     final res = await http.get(url);
 
     final data = dIstrictsModelFromJson(res.body);
@@ -191,8 +193,6 @@ class StepsProvider with ChangeNotifier {
   ValidationItem get effectiveEntered => this._effectiveEntered;
 
   void changeEffective(String value) {
-//    print("veri: $value");
-//    print("total cart: ${_cartProvider.totalCart}");
 
     if (value == null) {
       this._effectiveEntered = ValidationItem(
@@ -254,7 +254,6 @@ class StepsProvider with ChangeNotifier {
       });
     });
 
-//    notifyListeners();
   }
 
   TextEditingController addressController = new TextEditingController();
@@ -338,7 +337,6 @@ class StepsProvider with ChangeNotifier {
 
       return true;
     } else {
-//      print("p ${this._phoneEntered.value}");
       (this._phoneEntered.value == null)
           ? this.changePhone('')
           : this.changePhone(this._phoneEntered.value);
@@ -369,6 +367,30 @@ class StepsProvider with ChangeNotifier {
       this.changeEmail(this.emailEntered.value);
       return false;
     }
+  }
+
+  Future<dynamic> generatePayment(String token, String email) async{
+
+
+    final url = "$baseUrlAPI/payment/culqi/$urlStore/${_userPreferences.userCode}?token=${_userPreferences.authToken}";
+//    print(url);
+    final payload = {
+      "email" : email,
+      "token" : token,
+      "documentType" : "",
+      "phone" : phoneEntered.value,
+      "address" : addressEntered.value,
+      "reference" : referenceEntered.value,
+      "ubigeo" : "$departamentSelected-$provinceSelected-$districtSelected",
+      "observation" : observationEntered
+    };
+//    print(payload);
+    final response = await http.post(url, body: payload);
+    final res = response.body;
+    print("body: $res");
+    final decoded = jsonDecode(res);
+    return decoded;
+
   }
 
   void addressListener() {
@@ -471,14 +493,11 @@ class StepsProvider with ChangeNotifier {
 
     Future.wait([getUserDirections(),getAllDepartaments(),_loginProvider.verifyLogin()])
     .then((_){
-//      print("verificacion completa");
       this._loginProvider.setUserData().then((_) {
-//        print("user data completa");
         phoneController.text = _userPreferences.userPhone;
         emailController.text = _userPreferences.userEmail;
         this._cartProvider.getCart()
             .then((_){
-//          print("get cart complete");
           setLoading(false);
         });
       });

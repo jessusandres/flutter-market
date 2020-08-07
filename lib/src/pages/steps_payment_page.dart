@@ -4,12 +4,6 @@ import 'package:gustolact/src/providers/steps_provider.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/widgets/appbar_payment_widget.dart';
 import 'package:provider/provider.dart';
-
-class StepsPaymentPage extends StatefulWidget {
-  @override
-  _StepsPaymentPageState createState() => _StepsPaymentPageState();
-}
-
 class _MCircular extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -20,6 +14,12 @@ class _MCircular extends StatelessWidget {
   }
 
 }
+class StepsPaymentPage extends StatefulWidget {
+  @override
+  _StepsPaymentPageState createState() => _StepsPaymentPageState();
+}
+
+
 
 class _StepsPaymentPageState extends State<StepsPaymentPage> {
 
@@ -153,7 +153,8 @@ class _StepsContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 250),
       margin: EdgeInsets.symmetric(vertical: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

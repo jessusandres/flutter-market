@@ -141,6 +141,7 @@ class LoginProvider with ChangeNotifier {
 
     final res =
         await http.post('$baseUrlAPI/login?auth=$globalToken', body: body);
+
     final decode = jsonDecode(res.body);
 
     if (decode['ok'] == true) {
@@ -217,6 +218,7 @@ class LoginProvider with ChangeNotifier {
     final refreshUrl = '$baseUrlAPI/login/refreshToken?token=$token';
 
     final response = await http.get(verificationUrl);
+
     final decoded = jsonDecode(response.body);
 
     if (decoded['ok'] == true) {
