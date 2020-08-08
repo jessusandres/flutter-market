@@ -124,6 +124,7 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
           Toast.show(payResponse["message"], context, duration: 3, gravity: Toast.BOTTOM);
         }else {
           print("payment okay");
+          Toast.show('PAGO REALIZADO', context, duration: 2, gravity: Toast.BOTTOM);
         }
 
       } else if (response is CulqiError) {

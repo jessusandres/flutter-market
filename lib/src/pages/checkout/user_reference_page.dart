@@ -130,18 +130,19 @@ class _UserReferencePageState extends State<UserReferencePage> {
                           });
                         });
 
-                        return DropdownButton(
-                          style: TextStyle(
-//                            height: 3.0,
-                            color: AppTheme.nearlyBlack,
-//                            fontFamily:
-                          ),
-                            isExpanded: true,
-                            value: _stepsProvider.addressFrecuentlySelected,
-                            items: addressesList,
-                            onChanged: (String value) {
-                              _stepsProvider.changeAddressFrecuently(value);
-                            });
+                        return Container(
+                          child: DropdownButton(
+                            isDense: false,
+                            style: TextStyle(
+                              color: AppTheme.nearlyBlack,
+                            ),
+                              isExpanded: true,
+                              value: _stepsProvider.addressFrecuentlySelected,
+                              items: addressesList,
+                              onChanged: (String value) {
+                                _stepsProvider.changeAddressFrecuently(value);
+                              }),
+                        );
                       }
                     },
                   ),
@@ -397,7 +398,7 @@ class _UserReferencePageState extends State<UserReferencePage> {
                 ),
                 onChanged: (String value) {
                   if (value.length > 0) {
-                    // _setUserName(value);
+                    _stepsProvider.changeObservation(value);
                   }
                 },
               ),

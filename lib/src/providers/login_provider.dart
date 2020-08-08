@@ -145,12 +145,13 @@ class LoginProvider with ChangeNotifier {
     final decode = jsonDecode(res.body);
 
     if (decode['ok'] == true) {
+
       final payload = Jwt.parseJwt(decode['token']);
       final expirationDate = payload['exp'];
       final _userCode = payload['user']['userCode'];
       final _fullname =
           "${payload['user']['userName']} ${payload['user']['userLastname']}";
-      // TODO : save user email and paswword in secure storage -- save token in user preferences
+
       this._userPreferences.userEmail = femail;
       this._userPreferences.userFullName = _fullname;
       this._userPreferences.userCode = _userCode;

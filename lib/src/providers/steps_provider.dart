@@ -111,7 +111,7 @@ class StepsProvider with ChangeNotifier {
 
     final data = dIstrictsModelFromJson(res.body);
     final districts = data.districts;
-//    print("dis res: ${res.body}");
+    print("dis res: ${res.body}");
     _allDistrictsController.sink.add(districts);
     return true;
   }
@@ -214,8 +214,10 @@ class StepsProvider with ChangeNotifier {
   String get addressFrecuentlySelected => this._addressFrecuentlySelected;
 
   void changeAddressFrecuently(String selected) async {
+
     _allProvincesController.sink.add(null);
     _allDistrictsController.sink.add(null);
+
     this._addressFrecuentlySelected = selected;
 
     _userDirectionsController.value.forEach((element) {
@@ -226,7 +228,7 @@ class StepsProvider with ChangeNotifier {
 
           _allDepartamentsController.value.forEach((dpt) {
             if (dpt.name == address.departament) {
-              this.departamentSelected = dpt.ucode;
+              this._departamentSelected = dpt.ucode;
               this.getAllProvinces(dpt.ucode)
                   .then((_) =>
               {
@@ -238,12 +240,14 @@ class StepsProvider with ChangeNotifier {
                       for (final dist in _allDistrictsController.value) {
 //                        print(dist.name);
                         if (dist.name.trim() == address.district.trim()) {
-                          this.districtSelected = dist.ucode;
+                          this._districtSelected = dist.ucode;
                           break;
                         }
                       }
+                      this._provinceSelected = prov.ucode;
+                      notifyListeners();
                     });
-                    this.changeProvince(prov.ucode, charge: false);
+//                    this.changeProvince(prov.ucode, charge: false);
                     return;
                   }
                 })
@@ -382,8 +386,9 @@ class StepsProvider with ChangeNotifier {
       "address" : addressEntered.value,
       "reference" : referenceEntered.value,
       "ubigeo" : "$departamentSelected-$provinceSelected-$districtSelected",
-      "observation" : observationEntered
+      "observation" : observationEntered ?? ''
     };
+    
 //    print(payload);
     final response = await http.post(url, body: payload);
     final res = response.body;
@@ -490,6 +495,7 @@ class StepsProvider with ChangeNotifier {
     setLoading(true);
 
     setInputListeners();
+
 
     Future.wait([getUserDirections(),getAllDepartaments(),_loginProvider.verifyLogin()])
     .then((_){

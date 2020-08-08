@@ -25,6 +25,7 @@ void main() async{
 
   locator.registerLazySingleton(() => NavigationService());
   runApp(MyApp());
+
 }
 
 class MyApp extends StatelessWidget {

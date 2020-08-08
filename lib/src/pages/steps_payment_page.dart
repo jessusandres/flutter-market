@@ -19,13 +19,11 @@ class StepsPaymentPage extends StatefulWidget {
   _StepsPaymentPageState createState() => _StepsPaymentPageState();
 }
 
+class _StepsPaymentPageState extends State<StepsPaymentPage>{
 
-
-class _StepsPaymentPageState extends State<StepsPaymentPage> {
 
   @override
   Widget build(BuildContext context) {
-
 
     return Scaffold(
         appBar: AppBarPayment(),
@@ -171,6 +169,7 @@ class _StepNumber extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     Color bgColor;
     Color borderColor;
     Color textColor;
