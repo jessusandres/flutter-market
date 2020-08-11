@@ -36,7 +36,7 @@ class _MainPageState extends State<MainPage>
       _navigatorKeys[_selectedIndex]
           .currentState
           .pop(_navigatorKeys[_selectedIndex].currentContext);
-      return Future.value(true);
+      return Future.value(false);
     } else {
       if (_mainProvider.indexPage == 0) {
         SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop');

@@ -4,52 +4,54 @@ import 'package:gustolact/src/providers/steps_provider.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/widgets/appbar_payment_widget.dart';
 import 'package:provider/provider.dart';
+
 class _MCircular extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Center(
       child: CircularProgressIndicator(),
     );
   }
-
 }
+
 class StepsPaymentPage extends StatefulWidget {
   @override
   _StepsPaymentPageState createState() => _StepsPaymentPageState();
 }
 
-class _StepsPaymentPageState extends State<StepsPaymentPage>{
-
-
+class _StepsPaymentPageState extends State<StepsPaymentPage> {
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
         appBar: AppBarPayment(),
         body: MultiProvider(
           providers: [
-            ChangeNotifierProvider<NumberProvider>(create: (_) => new NumberProvider(),),
-            ChangeNotifierProvider<StepsProvider>(create: (_) => new StepsProvider(),),
+            ChangeNotifierProvider<NumberProvider>(
+              create: (_) => new NumberProvider(),
+            ),
+            ChangeNotifierProvider<StepsProvider>(
+              create: (_) => new StepsProvider(),
+            ),
           ],
           child: Builder(builder: (BuildContext context) {
-
-            final StepsProvider stepsProvider = Provider.of<StepsProvider>(context);
+            final StepsProvider stepsProvider =
+                Provider.of<StepsProvider>(context);
             return StreamBuilder(
               stream: stepsProvider.loadingStream,
-              builder: (BuildContext context, AsyncSnapshot<bool> asyncSnapshot){
-                if(!asyncSnapshot.hasData) {
+              builder:
+                  (BuildContext context, AsyncSnapshot<bool> asyncSnapshot) {
+                if (!asyncSnapshot.hasData) {
                   return _MCircular();
-                }else {
-//                  print("data: ${asyncSnapshot.data}");
-                  if(asyncSnapshot.data == true) {
+                } else {
+                  if (asyncSnapshot.data == true) {
                     return _MCircular();
-                  }else {
+                  } else {
                     return Container(
                       color: AppTheme.nearlyWhite,
                       child: Column(
                         children: [
-                          _StepsContainer(ammount: stepsProvider.listForms.length),
+                          _StepsContainer(
+                              ammount: stepsProvider.listForms.length),
                           Expanded(
                             child: _PageViewSteps(),
                           ),
@@ -60,17 +62,12 @@ class _StepsPaymentPageState extends State<StepsPaymentPage>{
                 }
               },
             );
-
           }),
         ));
   }
 }
 
-
-
 class _PageViewSteps extends StatefulWidget {
-
-
   @override
   __PageViewStepsState createState() => __PageViewStepsState();
 }
@@ -81,22 +78,52 @@ class __PageViewStepsState extends State<_PageViewSteps> {
   @override
   void initState() {
     _pageViewController.addListener(() {
+      final StepsProvider stepsProvider =
+          Provider.of<StepsProvider>(context, listen: false);
+      final NumberProvider numberProvider =
+          Provider.of<NumberProvider>(context, listen: false);
 
-      final allow = Provider.of<StepsProvider>(context, listen: false).getValidations();
-//      print(allow);
-      if(allow) {
-        Provider.of<NumberProvider>(context, listen: false).currentIndex =
-            _pageViewController.page;
-      }else {
+      final allow = stepsProvider.getValidations();
+      final curIndex = numberProvider.currentIndex;
 
-        setState(() {
-          _pageViewController.animateToPage(0,duration: Duration(milliseconds: 250), curve: Curves.easeIn);
-        });
-
+      if(numberProvider.currentIndex > 1.5) {
+        if(stepsProvider.voucher) {
+          if(curIndex > 2) {
+            if(!stepsProvider.getVoucherValidations()) {
+              setState(() {
+                _pageViewController.animateToPage(2,
+                    duration: Duration(milliseconds: 250), curve: Curves.easeIn);
+              });
+            }else {
+              numberProvider.currentIndex = _pageViewController.page;
+            }
+          }
+        }
       }
 
+      if (allow) {
+        if (curIndex > 1) {
 
+          final allowQuot = stepsProvider.getQuotationValidations();
+          if (!allowQuot) {
+            setState(() {
+              _pageViewController.animateToPage(1,
+                  duration: Duration(milliseconds: 250), curve: Curves.easeIn);
+            });
+          }
+
+        }
+
+        numberProvider.currentIndex = _pageViewController.page;
+
+      } else {
+        setState(() {
+          _pageViewController.animateToPage(0,
+              duration: Duration(milliseconds: 250), curve: Curves.easeIn);
+        });
+      }
     });
+
     super.initState();
   }
 
@@ -142,8 +169,6 @@ class __PageViewStepsState extends State<_PageViewSteps> {
   }
 }
 
-
-
 class _StepsContainer extends StatelessWidget {
   final int ammount;
 
@@ -169,7 +194,6 @@ class _StepNumber extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     Color bgColor;
     Color borderColor;
     Color textColor;

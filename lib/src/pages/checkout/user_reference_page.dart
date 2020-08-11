@@ -3,9 +3,10 @@ import 'package:gustolact/src/models/departaments_model.dart';
 import 'package:gustolact/src/models/districts_model.dart';
 import 'package:gustolact/src/models/provinces_model.dart';
 import 'package:gustolact/src/models/user_addresses_model.dart';
-import 'package:gustolact/src/options/payment_options.dart';
 import 'package:gustolact/src/providers/steps_provider.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
+import 'package:gustolact/src/widgets/divier_checkout_widget.dart';
+import 'package:gustolact/src/widgets/title_checkout.dart';
 import 'package:provider/provider.dart';
 
 class UserReferencePage extends StatefulWidget {
@@ -16,8 +17,6 @@ class UserReferencePage extends StatefulWidget {
 class _UserReferencePageState extends State<UserReferencePage> {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-
     final StepsProvider _stepsProvider = Provider.of<StepsProvider>(context);
 
     return SingleChildScrollView(
@@ -27,68 +26,12 @@ class _UserReferencePageState extends State<UserReferencePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(
-              height: 25,
-            ),
-            Container(
-              margin: EdgeInsets.only(bottom: 10),
-              child: Center(
-                child: Text(
-                  'Datos de Pago:',
-                  style: AppTheme.caption.copyWith(fontSize: 20),
-                ),
-              ),
-            ),
-            Divider(
-              color: AppTheme.primaryColor,
-              thickness: 1.3,
-            ),
-            _PaymentOptions(size: size, stepsProvider: _stepsProvider),
-            (_stepsProvider.paymentOptionSelected == PaymentOptions.efective)
-                ? AnimatedContainer(
-                    duration: Duration(milliseconds: 150),
-                    curve: Curves.easeIn,
-                    margin: EdgeInsets.only(bottom: 10),
-                    child: TextField(
-                      maxLines: 1,
-                      autofocus: false,
-                      controller: _stepsProvider.effectiveController,
-                      keyboardType:
-                          TextInputType.numberWithOptions(decimal: true),
-                      decoration: InputDecoration(
-                        errorText: _stepsProvider.effectiveEntered.error,
-                        icon: Icon(Icons.attach_money),
-                        labelText: 'Monto de Efectivo',
-                        helperText: 'Monto de Efectivo para pagar',
-                      ),
-//                      onChanged: _stepsProvider.changeEffective,
-                    ),
-                  )
-                : AnimatedContainer(
-                    duration: Duration(milliseconds: 150),
-                    curve: Curves.easeIn,
-                  ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              margin: EdgeInsets.only(bottom: 10),
-              child: Center(
-                child: Text(
-                  'Datos del Cliente:',
-                  style: AppTheme.caption.copyWith(fontSize: 20),
-                ),
-              ),
-            ),
-            Divider(
-              color: AppTheme.primaryColor,
-              thickness: 1.3,
-            ),
+            TitleCheckout(title: 'Datos del Cliente:'),
+            DividerCheckout(),
             SizedBox(
               height: 10,
             ),
             Row(
-//              width: size.width,
               children: [
                 Icon(Icons.map),
                 SizedBox(
@@ -132,10 +75,10 @@ class _UserReferencePageState extends State<UserReferencePage> {
 
                         return Container(
                           child: DropdownButton(
-                            isDense: false,
-                            style: TextStyle(
-                              color: AppTheme.nearlyBlack,
-                            ),
+                              isDense: false,
+                              style: TextStyle(
+                                color: AppTheme.nearlyBlack,
+                              ),
                               isExpanded: true,
                               value: _stepsProvider.addressFrecuentlySelected,
                               items: addressesList,
@@ -173,7 +116,7 @@ class _UserReferencePageState extends State<UserReferencePage> {
             Container(
               // padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: TextField(
-                 controller: _stepsProvider.phoneController,
+                controller: _stepsProvider.phoneController,
                 keyboardType: TextInputType.phone,
                 autofocus: false,
                 maxLength: 9,
@@ -183,7 +126,6 @@ class _UserReferencePageState extends State<UserReferencePage> {
                   labelText: 'Teléfono',
                   helperText: 'Telefono de contacto',
                 ),
-//                onChanged: _stepsProvider.changePhone,
               ),
             ),
             SizedBox(
@@ -200,7 +142,6 @@ class _UserReferencePageState extends State<UserReferencePage> {
                   labelText: 'Referencia Domicilio',
                   helperText: 'Referencia de entrega',
                 ),
-//                onChanged: _stepsProvider.changeReference,
               ),
             ),
             SizedBox(
@@ -409,46 +350,6 @@ class _UserReferencePageState extends State<UserReferencePage> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _PaymentOptions extends StatelessWidget {
-  const _PaymentOptions({
-    Key key,
-    @required this.size,
-    @required StepsProvider stepsProvider,
-  })  : _stepsProvider = stepsProvider,
-        super(key: key);
-
-  final Size size;
-  final StepsProvider _stepsProvider;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Container(
-          width: size.width * 0.40,
-          child: RadioListTile(
-              title: Text('Efectivo'),
-              groupValue: _stepsProvider.paymentOptionSelected,
-              value: PaymentOptions.efective,
-              onChanged: (PaymentOptions value) {
-                _stepsProvider.paymentOptionSelected = value;
-              }),
-        ),
-        Container(
-          width: size.width * 0.40,
-          child: RadioListTile(
-              title: Text('Tarjeta'),
-              groupValue: _stepsProvider.paymentOptionSelected,
-              value: PaymentOptions.card,
-              onChanged: (PaymentOptions value) {
-                _stepsProvider.paymentOptionSelected = value;
-              }),
-        ),
-      ],
     );
   }
 }

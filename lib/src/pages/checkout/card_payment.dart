@@ -110,10 +110,11 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
 
       final response = await _tokenizer.getToken(publicKey: publicCulquiKey);
 
+//      print(response);
+
       if (response is CulqiToken) {
 
 //        print("token: ${response.token}");
-
         final token = response.token;
         print("CALL API");
         final payResponse = await stepsProvider.generatePayment(token, email);
@@ -123,8 +124,7 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
         if(!payResponse["ok"]) {
           Toast.show(payResponse["message"], context, duration: 3, gravity: Toast.BOTTOM);
         }else {
-          print("payment okay");
-          Toast.show('PAGO REALIZADO', context, duration: 2, gravity: Toast.BOTTOM);
+          Toast.show(payResponse["message"], context, duration: 2, gravity: Toast.BOTTOM);
         }
 
       } else if (response is CulqiError) {

@@ -70,9 +70,7 @@ class LoginProvider with ChangeNotifier {
     final res = await http.get(url);
     final UserDataModel userDataModel = userDataModelFromJson(res.body);
     final userData = userDataModel.user;
-//    print("p1 ${userData.phone1}");
-//    print("p2 ${userData.phone2}");
-//    print("p3 ${userData.phone3}");
+
     if (userData.phone1 == null) {
       if (userData.phone2 == null) {
         if (userData.phone3 != null)

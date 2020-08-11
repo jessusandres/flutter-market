@@ -1,0 +1,4 @@
+enum VoucherTypes {
+  boleta,
+  factura
+}
