@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/config/config.dart';
@@ -71,10 +72,13 @@ class CartProvider with ChangeNotifier {
   Future<dynamic> getCart() async {
     print("==GET CART==");
     loadingCart = true;
-
-    final response = await http.get(
-        "$baseUrlAPI/cart/${_userPreferences.userCode}?token=${_userPreferences.authToken}");
+    final url = "$baseUrlAPI/cart/${_userPreferences.userCode}";
+//    print(url);
+    final response = await http.get(url, headers: {
+      HttpHeaders.authorizationHeader: "Bearer ${_userPreferences.authToken}"
+    });
     final decoded = jsonDecode(response.body);
+
     if (decoded['ok']) {
       final cart = userCartFromJson(jsonEncode(decoded['cart']));
 
@@ -109,9 +113,11 @@ class CartProvider with ChangeNotifier {
           "item_ammount": ammount.toString()
         };
 
-        final url =
-            "$baseUrlAPI/cart/${userPreferences.userCode}/$urlStore?token=${userPreferences.authToken}";
-        final response = await http.post(url, body: payload);
+        final url = "$baseUrlAPI/cart/${userPreferences.userCode}/$urlStore";
+        final response = await http.post(url, body: payload, headers: {
+          HttpHeaders.authorizationHeader:
+              "Bearer ${_userPreferences.authToken}"
+        });
 
         final decoded = jsonDecode(response.body);
         this.executingAction = false;
@@ -126,7 +132,6 @@ class CartProvider with ChangeNotifier {
 
   Future<Map<String, dynamic>> updateCartAmmount(
       UserCart userCart, double newAmmount) async {
-
     if (newAmmount == null) {
       return {"message": "Valores incorrectos"};
     }
@@ -156,9 +161,11 @@ class CartProvider with ChangeNotifier {
           "item_ammount": ammount.toString()
         };
 
-        final url =
-            "$baseUrlAPI/cart/${userPreferences.userCode}/$urlStore?token=${userPreferences.authToken}";
-        final response = await http.put(url, body: payload);
+        final url = "$baseUrlAPI/cart/${userPreferences.userCode}/$urlStore";
+        final response = await http.put(url, body: payload, headers: {
+          HttpHeaders.authorizationHeader:
+              "Bearer ${_userPreferences.authToken}"
+        });
 
         final decoded = jsonDecode(response.body);
         this.executingAction = false;
@@ -174,7 +181,9 @@ class CartProvider with ChangeNotifier {
     final url =
         "$baseUrlAPI/cart/${_userPreferences.userCode}/$urlStore/$itemcode?token=${_userPreferences.authToken}";
 
-    final response = await http.delete(url);
+    final response = await http.delete(url, headers: {
+      HttpHeaders.authorizationHeader: "Bearer ${_userPreferences.authToken}"
+    });
     final decoded = jsonDecode(response.body);
     this.getCart();
     return decoded;

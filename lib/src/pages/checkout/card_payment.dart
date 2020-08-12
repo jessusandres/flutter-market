@@ -65,9 +65,9 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
             padding: EdgeInsets.symmetric(horizontal: 10),
             child: RaisedButton(
               color: AppTheme.primaryColor,
-              onPressed: () {
+              onPressed: (!stepsProvider.applyPayment) ? () {
                 validateForm(context);
-              },
+              } : null,
               elevation: 0.0,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16.0)),

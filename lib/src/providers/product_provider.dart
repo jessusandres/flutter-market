@@ -64,10 +64,11 @@ class ProductProvider with ChangeNotifier {
     if (productImages[code].length > 0) {
       return;
     } else {
-      final url = '$storeUrlAPI/images/$code?auth=$globalToken';
+      final url = '$storeUrlAPI/product/images/$code?auth=$globalToken';
       final response = await http.get(url);
       final jsnresponse = jsonDecode(response.body);
-      final encoded = jsonEncode(jsnresponse['results']);
+//      print(jsnresponse);
+      final encoded = jsonEncode(jsnresponse['images']);
       List<ImageModel> images = imageModelFromJson(encoded);
 
       this._productImages[code].addAll(images);
@@ -87,7 +88,7 @@ class ProductProvider with ChangeNotifier {
     final productsRes = jsonDecode(response.body);
 //    print(productsRes);
 
-    final encoded = jsonEncode(productsRes['data']);
+    final encoded = jsonEncode(productsRes['products']);
     this.products = productModelFromJson(encoded);
 
     this.products.forEach((element) {
@@ -109,7 +110,7 @@ class ProductProvider with ChangeNotifier {
 
     loading = true;
 
-    final url = '$storeUrlAPI/related/$codi?auth=$globalToken';
+    final url = '$storeUrlAPI/product/related/$codi?auth=$globalToken';
     final response = await http.get(url);
     Map<String, dynamic> productsRel = jsonDecode(response.body);
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/models/departaments_model.dart';
@@ -11,7 +12,6 @@ import 'package:gustolact/src/models/validation_model.dart';
 import 'package:gustolact/src/options/payment_options.dart';
 import 'package:gustolact/src/options/voucher_types.dart';
 import 'package:gustolact/src/pages/checkout/card_payment.dart';
-import 'package:gustolact/src/pages/checkout/payment_resume.dart';
 import 'package:gustolact/src/pages/checkout/quotation_data.dart';
 import 'package:gustolact/src/pages/checkout/user_reference_page.dart';
 import 'package:gustolact/src/pages/checkout/voucher_data.dart';
@@ -22,12 +22,22 @@ import 'package:http/http.dart' as http;
 import 'package:rxdart/rxdart.dart';
 
 class StepsProvider with ChangeNotifier {
+
   final CartProvider _cartProvider = CartProvider();
   final LoginProvider _loginProvider = LoginProvider();
 
   final UserPreferences _userPreferences = new UserPreferences();
 
   final RegExp regExp = new RegExp(emailPattern);
+
+  bool _applyPayment = false;
+
+  bool get applyPayment => this._applyPayment;
+
+  set applyPayment(bool value) {
+    this._applyPayment = value;
+    notifyListeners();
+  }
 
   BehaviorSubject<List<StoreAddress>> _allStoreAddressesController =
       new BehaviorSubject<List<StoreAddress>>();
@@ -76,9 +86,14 @@ class StepsProvider with ChangeNotifier {
   }
 
   Future<dynamic> getUserDirections() async {
+
     final url =
-        "$baseUrlAPI/user/${_userPreferences.userCode}/directions?token=${_userPreferences.authToken}";
-    final res = await http.get(url);
+        "$baseUrlAPI/user/${_userPreferences.userCode}/addresses";
+
+    final res = await http.get(url, headers: {
+      HttpHeaders.authorizationHeader: "Bearer ${_userPreferences.authToken}"
+    });
+
     final userAddressesData = userAddressesFromJson(res.body);
     final userAddresses = userAddressesData.addresses;
     final List<Map<String, Address>> mList = [];
@@ -101,7 +116,7 @@ class StepsProvider with ChangeNotifier {
   }
 
   Future<bool> getAllDepartaments() async {
-    final url = "$baseUrlAPI/departaments?auth=$globalToken";
+    final url = "$baseUrlAPI/locations/departaments?auth=$globalToken";
     final res = await http.get(url);
     final data = departamentsModelFromJson(res.body);
 
@@ -111,7 +126,7 @@ class StepsProvider with ChangeNotifier {
   }
 
   Future<bool> getAllProvinces(String departamentCode) async {
-    final url = "$baseUrlAPI/$departamentCode/provinces?auth=$globalToken";
+    final url = "$baseUrlAPI/locations/$departamentCode/provinces?auth=$globalToken";
     final res = await http.get(url);
     final data = provincesModelFromJson(res.body);
     final provinces = data.provinces;
@@ -121,7 +136,7 @@ class StepsProvider with ChangeNotifier {
 
   Future<bool> getAllDistricts(String provinceCode) async {
     final url =
-        "$baseUrlAPI/$departamentSelected/$provinceCode/districts?auth=$globalToken";
+        "$baseUrlAPI/locations/$departamentSelected/$provinceCode/districts?auth=$globalToken";
     final res = await http.get(url);
 
     final data = dIstrictsModelFromJson(res.body);
@@ -535,6 +550,7 @@ class StepsProvider with ChangeNotifier {
   }
 
   Future<dynamic> generatePayment(String token, String email) async {
+    this.applyPayment = true;
     final dptName = this
         ._allDepartamentsController
         .value
@@ -552,7 +568,7 @@ class StepsProvider with ChangeNotifier {
         .name;
 
     final url =
-        "$baseUrlAPI/payment/culqi/$urlStore/${_userPreferences.userCode}?token=${_userPreferences.authToken}";
+        "$baseUrlAPI/payment/culqi/$urlStore/${_userPreferences.userCode}";
 
     final payload = {
       "email": email,
@@ -578,10 +594,13 @@ class StepsProvider with ChangeNotifier {
       });
     }
 
-    final response = await http.post(url, body: payload);
+    final response = await http.post(url, body: payload, headers: {
+      HttpHeaders.authorizationHeader: "Bearer ${_userPreferences.authToken}"
+    });
     final res = response.body;
     print("body: $res");
     final decoded = jsonDecode(res);
+    this.applyPayment = false;
     return decoded;
 //    return {"ok": false, "message": 'En prueba'};
   }

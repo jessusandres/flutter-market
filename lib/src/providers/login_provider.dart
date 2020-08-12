@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/config/config.dart';
@@ -60,14 +61,14 @@ class LoginProvider with ChangeNotifier {
     this.isLogged = false;
   }
 
-  noneF() {
-
-  }
+  noneF() {}
 
   Future<dynamic> setUserData() async {
     final url =
-        "$baseUrlAPI/user/${_userPreferences.userCode}?token=${_userPreferences.authToken}";
-    final res = await http.get(url);
+        "$baseUrlAPI/user/${_userPreferences.userCode}/profile";
+    final res = await http.get(url, headers: {
+      HttpHeaders.authorizationHeader: "Bearer ${_userPreferences.authToken}"
+    });
     final UserDataModel userDataModel = userDataModelFromJson(res.body);
     final userData = userDataModel.user;
 
@@ -97,15 +98,15 @@ class LoginProvider with ChangeNotifier {
     final body = {"email": this.email.value, "password": this.password.value};
 
     final res =
-        await http.post('$baseUrlAPI/login?auth=$globalToken', body: body);
+        await http.post('$baseUrlAPI/auth/login?auth=$globalToken', body: body);
     final decode = jsonDecode(res.body);
 
     if (decode['ok'] == true) {
       final payload = Jwt.parseJwt(decode['token']);
 
       final _fullname =
-          "${payload['user']['userName']} ${payload['user']['userLastname']}";
-      final _userCode = payload['user']['userCode'];
+          "${payload['userName']} ${payload['userLastname']}";
+      final _userCode = payload['userCode'];
 
       final expirationDate = payload['exp'];
       this._userPreferences.userEmail = this.email.value;
@@ -138,17 +139,18 @@ class LoginProvider with ChangeNotifier {
     final body = {"email": femail, "password": fpassword};
 
     final res =
-        await http.post('$baseUrlAPI/login?auth=$globalToken', body: body);
+        await http.post('$baseUrlAPI/auth/login?auth=$globalToken', body: body);
 
     final decode = jsonDecode(res.body);
-
-    if (decode['ok'] == true) {
-
+//    print("2: $decode");
+//    print(res.statusCode);
+    if (res.statusCode == 201) {
       final payload = Jwt.parseJwt(decode['token']);
+      print("pay: $payload");
       final expirationDate = payload['exp'];
-      final _userCode = payload['user']['userCode'];
+      final _userCode = payload['userCode'];
       final _fullname =
-          "${payload['user']['userName']} ${payload['user']['userLastname']}";
+          "${payload['userName']} ${payload['userLastname']}";
 
       this._userPreferences.userEmail = femail;
       this._userPreferences.userFullName = _fullname;
@@ -172,8 +174,6 @@ class LoginProvider with ChangeNotifier {
       if (this._userPreferences.authToken != null &&
           this._userPreferences.userEmail != null &&
           await this._securePreferences.userPassword != null) {
-
-
         final payload = Jwt.parseJwt(this._userPreferences.authToken);
 
         final expirationDate = payload['exp'];
@@ -189,7 +189,6 @@ class LoginProvider with ChangeNotifier {
         if (date.difference(currentDate).inMinutes < 20) {
           print("===TOKEN REFRESH===");
           this._refreshToken(this._userPreferences.authToken);
-
         } else {
           this.expirationDate = expirationDate;
           this._isLogged = true;
@@ -202,8 +201,7 @@ class LoginProvider with ChangeNotifier {
           notifyListeners();
         }
       }
-    }
-    else {
+    } else {
       print("Invalid token");
       if (this._isLogged == true) {
         this._isLogged = false;
@@ -213,26 +211,27 @@ class LoginProvider with ChangeNotifier {
   }
 
   void _refreshToken(String token) async {
-    final verificationUrl = '$baseUrlAPI/login/verification?token=$token';
-    final refreshUrl = '$baseUrlAPI/login/refreshToken?token=$token';
+    final verificationUrl = '$baseUrlAPI/auth/verification';
+    final refreshUrl = '$baseUrlAPI/auth/refreshToken';
 
-    final response = await http.get(verificationUrl);
-
+    final response = await http.get(verificationUrl,
+        headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
+    print(response.body);
     final decoded = jsonDecode(response.body);
 
-    if (decoded['ok'] == true) {
-      final rfrresponse = await http.get(refreshUrl);
+    if (response.statusCode == 200) {
+      final rfrresponse = await http.get(refreshUrl,
+          headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
 
       final rfrdecoded = jsonDecode(rfrresponse.body);
-
 
       final payload = Jwt.parseJwt(rfrdecoded['newToken']);
 
       final expirationDate = payload['exp'];
-      final _userCode = payload['user']['userCode'];
+      final _userCode = payload['userCode'];
       final _fullname =
-          "${payload['user']['userName']} ${payload['user']['userLastname']}";
-      final _email = payload['user']['userEmail'];
+          "${payload['userName']} ${payload['userLastname']}";
+      final _email = payload['userEmail'];
 
       print(
           "new ex: ${DateTime.fromMillisecondsSinceEpoch(expirationDate * 1000)}");
@@ -244,21 +243,52 @@ class LoginProvider with ChangeNotifier {
       this._userPreferences.userEmail = _email;
 
       this.isLogged = true;
-
     } else {
-
-      if (decoded['err']['name'] == 'TokenExpiredError') {
-
-        await this._loginExpiration(this._userPreferences.userEmail,
-            await this._securePreferences.userPassword);
-      } else {
-
-        this._userPreferences.clear();
-        this._securePreferences.clear();
-        this._isLogged = false;
-        notifyListeners();
-      }
+      await this._loginExpiration(this._userPreferences.userEmail,
+          await this._securePreferences.userPassword);
     }
+
+//    if (decoded['ok'] == true) {
+//      final rfrresponse = await http.get(refreshUrl, headers: {
+//        HttpHeaders.authorizationHeader: "Bearer $token"
+//      });
+//
+//      final rfrdecoded = jsonDecode(rfrresponse.body);
+//
+//
+//      final payload = Jwt.parseJwt(rfrdecoded['newToken']);
+//
+//      final expirationDate = payload['exp'];
+//      final _userCode = payload['user']['userCode'];
+//      final _fullname =
+//          "${payload['user']['userName']} ${payload['user']['userLastname']}";
+//      final _email = payload['user']['userEmail'];
+//
+//      print(
+//          "new ex: ${DateTime.fromMillisecondsSinceEpoch(expirationDate * 1000)}");
+//
+//      this.expirationDate = expirationDate;
+//      this._userPreferences.authToken = rfrdecoded['newToken'];
+//      this._userPreferences.userFullName = _fullname;
+//      this._userPreferences.userCode = _userCode;
+//      this._userPreferences.userEmail = _email;
+//
+//      this.isLogged = true;
+//
+//    } else {
+//
+//      if (decoded['err']['name'] == 'TokenExpiredError') {
+//
+//        await this._loginExpiration(this._userPreferences.userEmail,
+//            await this._securePreferences.userPassword);
+//      } else {
+//
+//        this._userPreferences.clear();
+//        this._securePreferences.clear();
+//        this._isLogged = false;
+//        notifyListeners();
+//      }
+//    }
   }
 
   bool get isValid => this._email.value != null && this._password.value != null;
@@ -273,7 +303,6 @@ class LoginProvider with ChangeNotifier {
       notifyListeners();
       return;
     }
-
 
     RegExp regExp = new RegExp(emailPattern);
 

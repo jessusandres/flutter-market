@@ -1,6 +1,3 @@
-// To parse this JSON data, do
-//
-//     final userDataModel = userDataModelFromJson(jsonString);
 
 import 'dart:convert';
 
@@ -19,12 +16,12 @@ class UserDataModel {
 
   factory UserDataModel.fromJson(Map<String, dynamic> json) => UserDataModel(
     ok: json["ok"],
-    user: User.fromJson(json["user"]),
+    user: User.fromJson(json["profile"]),
   );
 
   Map<String, dynamic> toJson() => {
     "ok": ok,
-    "user": user.toJson(),
+    "profile": user.toJson(),
   };
 }
 
