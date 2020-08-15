@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gustolact/src/options/payment_options.dart';
 import 'package:gustolact/src/options/voucher_types.dart';
 import 'package:gustolact/src/providers/steps_provider.dart';
-import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/widgets/title_checkout.dart';
 import 'package:gustolact/src/widgets/voucherButtonPayment_widget.dart';
 import 'package:provider/provider.dart';

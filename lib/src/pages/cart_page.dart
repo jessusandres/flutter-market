@@ -106,10 +106,16 @@ class _CartContainer extends StatelessWidget {
 
   Widget _itemListCart(
       {@required BuildContext mainContext, @required List<UserCart> cart}) {
+
+
+
     return ListView.builder(
       physics: BouncingScrollPhysics(),
       itemCount: cart.length,
       itemBuilder: (BuildContext context, int index) {
+
+        final size = MediaQuery.of(context).size;
+
         TextEditingController textEditingController = new TextEditingController(
             text: cart[index].cartItemAmmount.toString());
 
@@ -122,7 +128,7 @@ class _CartContainer extends StatelessWidget {
               color: AppTheme.white,
               child: ListTile(
                 leading: Container(
-                  width: 125,
+                  width: size.width * 0.3,
                   child: FadeInImage(
                     placeholder: AssetImage('assets/gif/loading.gif'),
                     image: NetworkImage(cart[index].getImage()),

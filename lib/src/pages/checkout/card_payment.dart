@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_culqi/flutter_culqi.dart';
 import 'package:gustolact/src/config/config.dart';
+import 'package:gustolact/src/models/culqipaymentresponse_model.dart';
+import 'package:gustolact/src/pages/checkout/payment_resume.dart';
 import 'package:gustolact/src/providers/steps_provider.dart';
+import 'package:gustolact/src/tansitions/fade_transition.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
@@ -65,14 +68,19 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
             padding: EdgeInsets.symmetric(horizontal: 10),
             child: RaisedButton(
               color: AppTheme.primaryColor,
-              onPressed: (!stepsProvider.applyPayment) ? () {
-                validateForm(context);
-              } : null,
+              onPressed: (!stepsProvider.applyPayment)
+                  ? () {
+                      stepsProvider.applyPayment = true;
+                      validateForm(context);
+                    }
+                  : null,
               elevation: 0.0,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16.0)),
               child: Text(
-                'Procesar Compra',
+                stepsProvider.applyPayment
+                    ? 'Realizando compra...'
+                    : 'Procesar Compra',
                 style: TextStyle(color: AppTheme.white),
               ),
             ),
@@ -88,49 +96,46 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
     final validation = stepsProvider.getAllValidations();
     if (validation) {
       getToken(context);
+    } else {
+      stepsProvider.applyPayment = false;
     }
   }
 
   void getToken(BuildContext context) async {
-
     CulqiCard _card = CulqiCard();
 
     final StepsProvider stepsProvider =
         Provider.of<StepsProvider>(context, listen: false);
     _card.email = stepsProvider.emailEntered.value;
-    final email  =_card.email;
+    final email = _card.email;
     bool success = _widgetKey.currentState.setInfoOn(_card);
 
     if (success) {
-
-//      print("card ${_card.cardNumber}");
-//      print("suc: $success");
-
       CulqiTokenizer _tokenizer = CulqiTokenizer(_card);
 
       final response = await _tokenizer.getToken(publicKey: publicCulquiKey);
 
-//      print(response);
-
       if (response is CulqiToken) {
-
-//        print("token: ${response.token}");
         final token = response.token;
-        print("CALL API");
-        final payResponse = await stepsProvider.generatePayment(token, email);
-
-        print(payResponse);
-
-        if(!payResponse["ok"]) {
-          Toast.show(payResponse["message"], context, duration: 3, gravity: Toast.BOTTOM);
-        }else {
-          Toast.show(payResponse["message"], context, duration: 2, gravity: Toast.BOTTOM);
+        final apiResponse = await stepsProvider.generatePayment(token, email);
+        print(apiResponse);
+        if (!apiResponse['ok']) {
+          Toast.show(apiResponse['message'], context,
+              duration: 3, gravity: Toast.BOTTOM);
+        } else {
+          final CulqiPaymentResponse payResponse = apiResponse;
+          Navigator.pushReplacement(context,
+              FadeRoute(page: PaymentResumePage(paymentResponse: payResponse)));
+          Toast.show(payResponse.message, context,
+              duration: 2, gravity: Toast.BOTTOM);
         }
-
       } else if (response is CulqiError) {
+        stepsProvider.applyPayment = false;
         Toast.show(response.errorMessage, context,
             duration: 3, gravity: Toast.BOTTOM);
       }
+    } else {
+      stepsProvider.applyPayment = false;
     }
   }
 }

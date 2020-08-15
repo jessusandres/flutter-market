@@ -23,7 +23,7 @@ class _StepsPaymentPageState extends State<StepsPaymentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBarPayment(),
+        appBar: AppBarPayment(title: 'Checkout'),
         body: MultiProvider(
           providers: [
             ChangeNotifierProvider<NumberProvider>(
@@ -131,13 +131,6 @@ class __PageViewStepsState extends State<_PageViewSteps> {
   void dispose() {
     _pageViewController.dispose();
     super.dispose();
-  }
-
-  void _nextFormStep() {
-    _pageViewController.nextPage(
-      duration: Duration(milliseconds: 300),
-      curve: Curves.ease,
-    );
   }
 
   Future<bool> onWillPop() async {

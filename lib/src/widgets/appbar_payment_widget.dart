@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 
 class AppBarPayment extends PreferredSize {
+  final String title;
   final double height = 65.0;
+
+  AppBarPayment({ this.title = 'PAGO'});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,7 @@ class AppBarPayment extends PreferredSize {
                 height: double.infinity,
                 child: Center(
                   child: Text(
-                    "CHECKOUT",
+                    this.title,
                     style: AppTheme.subtitle,
                   ),
                 ),

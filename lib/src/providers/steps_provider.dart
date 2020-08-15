@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/config/config.dart';
+import 'package:gustolact/src/models/culqipaymentresponse_model.dart';
 import 'package:gustolact/src/models/departaments_model.dart';
 import 'package:gustolact/src/models/districts_model.dart';
 import 'package:gustolact/src/models/provinces_model.dart';
@@ -35,8 +36,14 @@ class StepsProvider with ChangeNotifier {
   bool get applyPayment => this._applyPayment;
 
   set applyPayment(bool value) {
-    this._applyPayment = value;
-    notifyListeners();
+
+    if(this._applyPayment != value) {
+      this._applyPayment = value;
+      notifyListeners();
+    }else {
+      this._applyPayment = value;
+    }
+
   }
 
   BehaviorSubject<List<StoreAddress>> _allStoreAddressesController =
@@ -95,6 +102,7 @@ class StepsProvider with ChangeNotifier {
     });
 
     final userAddressesData = userAddressesFromJson(res.body);
+
     final userAddresses = userAddressesData.addresses;
     final List<Map<String, Address>> mList = [];
     userAddresses.forEach((element) {
@@ -550,6 +558,7 @@ class StepsProvider with ChangeNotifier {
   }
 
   Future<dynamic> generatePayment(String token, String email) async {
+
     this.applyPayment = true;
     final dptName = this
         ._allDepartamentsController
@@ -581,28 +590,43 @@ class StepsProvider with ChangeNotifier {
       "phone": phoneEntered.value,
       "address": addressEntered.value,
       "reference": referenceEntered.value,
-      "ubigeo": "$departamentSelected-$provinceSelected-$districtSelected",
+      "ubigeo": "$departamentSelected$provinceSelected$districtSelected",
       "observation": observationEntered ?? '',
       "voucher": voucher.toString()
     };
 
     if (voucher) {
+
       payload.addAll({
         "voucherType": (voucherTypeSelected.index == 0) ? 'B' : 'F',
         "voucherName": voucherNameEntered.value,
         "voucherDocument": voucherDocEntered.value
       });
+
     }
 
     final response = await http.post(url, body: payload, headers: {
       HttpHeaders.authorizationHeader: "Bearer ${_userPreferences.authToken}"
     });
+
     final res = response.body;
+    print(response.statusCode);
     print("body: $res");
     final decoded = jsonDecode(res);
     this.applyPayment = false;
-    return decoded;
-//    return {"ok": false, "message": 'En prueba'};
+    if(response.statusCode == 200) {
+      final culqiResponse = CulqiPaymentResponse.fromJson(decoded);
+      return culqiResponse;
+    }else if(response.statusCode == 401) {
+      return {
+        "ok": false,
+        "message": "Por favor vuelva a realizar el proceso de pago"
+      };
+    }else {
+      return decoded;
+    }
+
+
   }
 
   void addressListener() {
