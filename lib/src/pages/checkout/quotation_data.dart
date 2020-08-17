@@ -62,8 +62,9 @@ class QuotationDataStep extends StatelessWidget {
                     title: 'Datos de despacho',
                   ),
                   DividerCheckout(),
+                  _DeliveryDropdown(stepsProvider: _stepsProvider,),
                   SizedBox(
-                    height: 25,
+                    height: 10,
                   ),
                   _StoreAddresses(stepsProvider: _stepsProvider),
                   SizedBox(
@@ -83,13 +84,50 @@ class QuotationDataStep extends StatelessWidget {
                             _stepsProvider.paymentOptionSelected !=
                                 PaymentOptions.card)
                         ? VoucherButtonPayment(
-                            enable: _stepsProvider.getQuotationValidations(anotherPage: true))
+                            enable: _stepsProvider.getQuotationValidations(
+                                anotherPage: true))
                         : Container(),
                   ),
                   SizedBox(
                     height: 10,
                   )
                 ])));
+  }
+}
+
+class _DeliveryDropdown extends StatelessWidget {
+  final StepsProvider stepsProvider;
+
+  const _DeliveryDropdown({@required this.stepsProvider});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Icon(
+          Icons.motorcycle,
+          color: Colors.grey,
+        ),
+        SizedBox(
+          width: 14,
+        ),
+        Expanded(
+          child: DropdownButton(
+            isExpanded: true,
+            items: <DropdownMenuItem>[
+              DropdownMenuItem(
+                child: Text('Recojo en tienda'),
+                value: 1,
+              ),
+              DropdownMenuItem(
+                  child: Text('Coordinar despacho con tienda'), value: 2),
+            ],
+            value: stepsProvider.deliveryType,
+            onChanged: (val){ stepsProvider.deliveryType = val; },
+          ),
+        ),
+      ],
+    );
   }
 }
 

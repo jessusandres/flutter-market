@@ -20,7 +20,7 @@ class CulqiPaymentResponse {
   double total;
   List<dynamic> observations;
   UserPaymentCulqi userPaymentCulqi;
-  List<CulqiItem> items;
+  List<Item> items;
   String message;
   bool emailStatus;
   dynamic emailError;
@@ -30,7 +30,7 @@ class CulqiPaymentResponse {
     total: json["total"].toDouble(),
     observations: List<dynamic>.from(json["observations"].map((x) => x)),
     userPaymentCulqi: UserPaymentCulqi.fromJson(json["userPaymentCulqi"]),
-    items: List<CulqiItem>.from(json["items"].map((x) => CulqiItem.fromJson(x))),
+    items: List<Item>.from(json["items"].map((x) => Item.fromJson(x))),
     message: json["message"],
     emailStatus: json["emailStatus"],
     emailError: json["emailError"],
@@ -46,12 +46,10 @@ class CulqiPaymentResponse {
     "emailStatus": emailStatus,
     "emailError": emailError,
   };
-
-
 }
 
-class CulqiItem {
-  CulqiItem({
+class Item {
+  Item({
     this.cartCode,
     this.cartRuc,
     this.cartStoreName,
@@ -85,7 +83,7 @@ class CulqiItem {
   String cartRegisterDate;
   int cartStatus;
 
-  factory CulqiItem.fromJson(Map<String, dynamic> json) => CulqiItem(
+  factory Item.fromJson(Map<String, dynamic> json) => Item(
     cartCode: json["cartCode"],
     cartRuc: json["cartRuc"],
     cartStoreName: json["cartStoreName"],
@@ -131,6 +129,7 @@ class CulqiItem {
       return 'http://redmovildenegocios.com/Mas7er/r3dmark3t/images_items/imagennodisponible.jpg';
     }
   }
+
 }
 
 class UserPaymentCulqi {

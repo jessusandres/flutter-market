@@ -118,16 +118,18 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
       if (response is CulqiToken) {
         final token = response.token;
         final apiResponse = await stepsProvider.generatePayment(token, email);
+
         print(apiResponse);
-        if (!apiResponse['ok']) {
-          Toast.show(apiResponse['message'], context,
-              duration: 3, gravity: Toast.BOTTOM);
-        } else {
+
+        if (apiResponse is CulqiPaymentResponse) {
           final CulqiPaymentResponse payResponse = apiResponse;
           Navigator.pushReplacement(context,
               FadeRoute(page: PaymentResumePage(paymentResponse: payResponse)));
           Toast.show(payResponse.message, context,
               duration: 2, gravity: Toast.BOTTOM);
+        } else {
+          Toast.show(apiResponse['message'], context,
+              duration: 3, gravity: Toast.BOTTOM);
         }
       } else if (response is CulqiError) {
         stepsProvider.applyPayment = false;

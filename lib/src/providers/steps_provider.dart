@@ -46,6 +46,13 @@ class StepsProvider with ChangeNotifier {
 
   }
 
+  int _deliveryType = 1;
+  int get deliveryType => this._deliveryType;
+  set deliveryType(int value) {
+    this._deliveryType = value;
+    notifyListeners();
+  }
+
   BehaviorSubject<List<StoreAddress>> _allStoreAddressesController =
       new BehaviorSubject<List<StoreAddress>>();
 
@@ -117,6 +124,7 @@ class StepsProvider with ChangeNotifier {
   Future<bool> getAllStoreAddresses() async {
     final url = "$storeUrlAPI/addresses?auth=$globalToken";
     final res = await http.get(url);
+    print("store ad : ${res.body}");
     final data = storeAddressDataModelFromJson(res.body);
     final addresses = data.addresses;
     _allStoreAddressesController.sink.add(addresses);
@@ -543,7 +551,8 @@ class StepsProvider with ChangeNotifier {
       "reference": referenceEntered.value,
       "ubigeo": "$departamentSelected-$provinceSelected-$districtSelected",
       "observation": observationEntered ?? '',
-      "voucher": voucher
+      "voucher": voucher,
+      "deliveryType": deliveryType
     };
 
     if (voucher) {
@@ -610,12 +619,13 @@ class StepsProvider with ChangeNotifier {
     });
 
     final res = response.body;
-    print(response.statusCode);
-    print("body: $res");
+    print("status: ${response.statusCode}");
+
     final decoded = jsonDecode(res);
     this.applyPayment = false;
-    if(response.statusCode == 200) {
-      final culqiResponse = CulqiPaymentResponse.fromJson(decoded);
+
+    if(response.statusCode == 201) {
+      final culqiResponse = culqiPaymentResponseFromJson(res);
       return culqiResponse;
     }else if(response.statusCode == 401) {
       return {
@@ -625,7 +635,6 @@ class StepsProvider with ChangeNotifier {
     }else {
       return decoded;
     }
-
 
   }
 
@@ -743,7 +752,8 @@ class StepsProvider with ChangeNotifier {
       getAllDepartaments(),
       getAllStoreAddresses(),
       _loginProvider.verifyLogin()
-    ]).then((_) {
+    ]).then((res) {
+
       this._loginProvider.setUserData().then((_) {
         phoneController.text = _userPreferences.userPhone;
         emailController.text = _userPreferences.userEmail;
@@ -751,6 +761,9 @@ class StepsProvider with ChangeNotifier {
           setLoading(false);
         });
       });
+    })
+    .catchError((err) {
+      print(err);
     });
   }
 }

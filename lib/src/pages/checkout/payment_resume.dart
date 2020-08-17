@@ -34,7 +34,7 @@ class PaymentResumePage extends StatelessWidget {
             ),
             Expanded(
                 child: ListView.builder(
-                    physics: BouncingScrollPhysics(),
+//                    physics: BouncingScrollPhysics(),
                     itemCount: items.length,
                     itemBuilder: (BuildContext context, int index) {
                       return ItemDetail(item: items[index]);
@@ -55,7 +55,7 @@ class ItemDetail extends StatelessWidget {
     @required this.item,
   }) : super(key: key);
 
-  final CulqiItem item;
+  final Item item;
 
   @override
   Widget build(BuildContext context) {
