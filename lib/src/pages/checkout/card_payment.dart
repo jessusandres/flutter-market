@@ -124,7 +124,7 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
         if (apiResponse is CulqiPaymentResponse) {
           final CulqiPaymentResponse payResponse = apiResponse;
           Navigator.pushReplacement(context,
-              FadeRoute(page: PaymentResumePage(paymentResponse: payResponse)));
+              FadeRoute(page: PaymentResumePage(culqiPaymentResponse: payResponse)));
           Toast.show(payResponse.message, context,
               duration: 2, gravity: Toast.BOTTOM);
         } else {

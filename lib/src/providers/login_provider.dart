@@ -64,6 +64,9 @@ class LoginProvider with ChangeNotifier {
   noneF() {}
 
   Future<dynamic> setUserData() async {
+
+    if(_userPreferences.userPhone != null ) return;
+//    print('get profile');
     final url =
         "$baseUrlAPI/user/${_userPreferences.userCode}/profile";
     final res = await http.get(url, headers: {

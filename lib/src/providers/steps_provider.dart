@@ -7,6 +7,7 @@ import 'package:gustolact/src/models/culqipaymentresponse_model.dart';
 import 'package:gustolact/src/models/departaments_model.dart';
 import 'package:gustolact/src/models/districts_model.dart';
 import 'package:gustolact/src/models/provinces_model.dart';
+import 'package:gustolact/src/models/quotation_response.dart';
 import 'package:gustolact/src/models/store_address_model.dart';
 import 'package:gustolact/src/models/user_addresses_model.dart';
 import 'package:gustolact/src/models/validation_model.dart';
@@ -23,7 +24,6 @@ import 'package:http/http.dart' as http;
 import 'package:rxdart/rxdart.dart';
 
 class StepsProvider with ChangeNotifier {
-
   final CartProvider _cartProvider = CartProvider();
   final LoginProvider _loginProvider = LoginProvider();
 
@@ -36,18 +36,18 @@ class StepsProvider with ChangeNotifier {
   bool get applyPayment => this._applyPayment;
 
   set applyPayment(bool value) {
-
-    if(this._applyPayment != value) {
+    if (this._applyPayment != value) {
       this._applyPayment = value;
       notifyListeners();
-    }else {
+    } else {
       this._applyPayment = value;
     }
-
   }
 
   int _deliveryType = 1;
+
   int get deliveryType => this._deliveryType;
+
   set deliveryType(int value) {
     this._deliveryType = value;
     notifyListeners();
@@ -100,9 +100,7 @@ class StepsProvider with ChangeNotifier {
   }
 
   Future<dynamic> getUserDirections() async {
-
-    final url =
-        "$baseUrlAPI/user/${_userPreferences.userCode}/addresses";
+    final url = "$baseUrlAPI/user/${_userPreferences.userCode}/addresses";
 
     final res = await http.get(url, headers: {
       HttpHeaders.authorizationHeader: "Bearer ${_userPreferences.authToken}"
@@ -124,7 +122,6 @@ class StepsProvider with ChangeNotifier {
   Future<bool> getAllStoreAddresses() async {
     final url = "$storeUrlAPI/addresses?auth=$globalToken";
     final res = await http.get(url);
-    print("store ad : ${res.body}");
     final data = storeAddressDataModelFromJson(res.body);
     final addresses = data.addresses;
     _allStoreAddressesController.sink.add(addresses);
@@ -142,7 +139,8 @@ class StepsProvider with ChangeNotifier {
   }
 
   Future<bool> getAllProvinces(String departamentCode) async {
-    final url = "$baseUrlAPI/locations/$departamentCode/provinces?auth=$globalToken";
+    final url =
+        "$baseUrlAPI/locations/$departamentCode/provinces?auth=$globalToken";
     final res = await http.get(url);
     final data = provincesModelFromJson(res.body);
     final provinces = data.provinces;
@@ -541,6 +539,7 @@ class StepsProvider with ChangeNotifier {
         .name;
 
     final Map<String, dynamic> payload = {
+      "cardPayment": "false",
       "provinceName": prvName,
       "departamentName": dptName,
       "districtName": dstName,
@@ -549,10 +548,10 @@ class StepsProvider with ChangeNotifier {
       "phone": phoneEntered.value,
       "address": addressEntered.value,
       "reference": referenceEntered.value,
-      "ubigeo": "$departamentSelected-$provinceSelected-$districtSelected",
+      "ubigeo": "$departamentSelected$provinceSelected$districtSelected",
       "observation": observationEntered ?? '',
-      "voucher": voucher,
-      "deliveryType": deliveryType
+      "voucher": voucher.toString(),
+      "deliveryType": deliveryType.toString()
     };
 
     if (voucher) {
@@ -563,11 +562,28 @@ class StepsProvider with ChangeNotifier {
       });
     }
 
-    print(payload);
+    final url =
+        "$baseUrlAPI/payment/quotation/$urlStore/${_userPreferences.userCode}";
+    final response = await http.post(url, body: payload, headers: {
+      HttpHeaders.authorizationHeader: "Bearer ${_userPreferences.authToken}"
+    });
+    final res = response.body;
+    print("status: ${response.statusCode}");
+
+    final decoded = jsonDecode(res);
+    this.applyPayment = false;
+    print(decoded);
+    if(response.statusCode == 201) {
+      final quotationResponse = quotationPaymentResponseFromJson(res);
+      return quotationResponse;
+    }else {
+      return decoded;
+    }
+
+
   }
 
   Future<dynamic> generatePayment(String token, String email) async {
-
     this.applyPayment = true;
     final dptName = this
         ._allDepartamentsController
@@ -594,24 +610,23 @@ class StepsProvider with ChangeNotifier {
       "provinceName": prvName,
       "departamentName": dptName,
       "districtName": dstName,
-      "effectiveAmmount": this.effectiveEntered.value,
+      "cardPayment": "true",
       "warehouseCode": this.storeAddressSelected,
       "phone": phoneEntered.value,
       "address": addressEntered.value,
       "reference": referenceEntered.value,
       "ubigeo": "$departamentSelected$provinceSelected$districtSelected",
       "observation": observationEntered ?? '',
-      "voucher": voucher.toString()
+      "voucher": voucher.toString(),
+      "deliveryType": deliveryType.toString()
     };
 
     if (voucher) {
-
       payload.addAll({
         "voucherType": (voucherTypeSelected.index == 0) ? 'B' : 'F',
         "voucherName": voucherNameEntered.value,
         "voucherDocument": voucherDocEntered.value
       });
-
     }
 
     final response = await http.post(url, body: payload, headers: {
@@ -624,18 +639,17 @@ class StepsProvider with ChangeNotifier {
     final decoded = jsonDecode(res);
     this.applyPayment = false;
 
-    if(response.statusCode == 201) {
+    if (response.statusCode == 201) {
       final culqiResponse = culqiPaymentResponseFromJson(res);
       return culqiResponse;
-    }else if(response.statusCode == 401) {
+    } else if (response.statusCode == 401) {
       return {
         "ok": false,
         "message": "Por favor vuelva a realizar el proceso de pago"
       };
-    }else {
+    } else {
       return decoded;
     }
-
   }
 
   void addressListener() {
@@ -742,18 +756,13 @@ class StepsProvider with ChangeNotifier {
     voucherDocListener();
   }
 
-  StepsProvider() {
-    setLoading(true);
-
-    setInputListeners();
-
-    Future.wait([
+  initializedData() {
+    return Future.wait([
       getUserDirections(),
       getAllDepartaments(),
       getAllStoreAddresses(),
       _loginProvider.verifyLogin()
     ]).then((res) {
-
       this._loginProvider.setUserData().then((_) {
         phoneController.text = _userPreferences.userPhone;
         emailController.text = _userPreferences.userEmail;
@@ -761,9 +770,18 @@ class StepsProvider with ChangeNotifier {
           setLoading(false);
         });
       });
-    })
-    .catchError((err) {
+    }).catchError((err) {
+      print("errores: ");
       print(err);
+//      this.initializedData();
     });
+  }
+
+  StepsProvider() {
+    setLoading(true);
+
+    setInputListeners();
+
+    this.initializedData();
   }
 }

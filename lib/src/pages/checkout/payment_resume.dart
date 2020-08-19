@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/models/culqipaymentresponse_model.dart';
+import 'package:gustolact/src/models/paymentItem.dart';
+import 'package:gustolact/src/models/quotation_response.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:gustolact/src/widgets/appbar_payment_widget.dart';
 
 class PaymentResumePage extends StatelessWidget {
-  final CulqiPaymentResponse paymentResponse;
+  final CulqiPaymentResponse culqiPaymentResponse;
+  final QuotationPaymentResponse quotationPaymentResponse;
+//  final bool isCulqi;
 
-  const PaymentResumePage({@required this.paymentResponse}) : assert(paymentResponse != null);
+
+  const PaymentResumePage({this.culqiPaymentResponse, this.quotationPaymentResponse});
 
   @override
   Widget build(BuildContext context) {
 
-    final items = this.paymentResponse.items;
+    final items = this.culqiPaymentResponse == null ? this.quotationPaymentResponse.items : this.culqiPaymentResponse.items;
+    final isCulqi = this.culqiPaymentResponse == null ? false : true;
+    final total = this.culqiPaymentResponse == null ? this.quotationPaymentResponse.total : this.culqiPaymentResponse.total;
 
     return Scaffold(
       appBar: AppBarPayment(title: 'Resumen de Compra'),
@@ -29,18 +36,28 @@ class PaymentResumePage extends StatelessWidget {
               )),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Text('Resumen de compra:'),
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              child: Text(
+                'Productos facturados:',
+                style: AppTheme.caption.copyWith(fontSize: 14),
+              ),
             ),
             Expanded(
                 child: ListView.builder(
-//                    physics: BouncingScrollPhysics(),
+                    physics: BouncingScrollPhysics(),
                     itemCount: items.length,
                     itemBuilder: (BuildContext context, int index) {
                       return ItemDetail(item: items[index]);
                     })),
             Container(
-              child: Text('Total pagado: ${paymentResponse.total}'),
+              width: double.infinity,
+              alignment: Alignment.center,
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              child: Text(
+                'Total ${ isCulqi ? 'pagado' : 'por pagar' } : $total',
+                style: AppTheme.caption
+                    .copyWith(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
@@ -55,7 +72,7 @@ class ItemDetail extends StatelessWidget {
     @required this.item,
   }) : super(key: key);
 
-  final Item item;
+  final PaymentItem item;
 
   @override
   Widget build(BuildContext context) {
