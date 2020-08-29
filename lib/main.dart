@@ -7,6 +7,7 @@ import 'package:gustolact/src/providers/home_provider.dart';
 import 'package:gustolact/src/providers/login_provider.dart';
 import 'package:gustolact/src/providers/main_provider.dart';
 import 'package:gustolact/src/providers/product_provider.dart';
+import 'package:gustolact/src/providers/push_provider.dart';
 import 'package:gustolact/src/providers/search_provider.dart';
 import 'package:gustolact/src/routes/main_routes.dart';
 import 'package:gustolact/src/shared_preferences/user_preferences.dart';
@@ -28,7 +29,42 @@ void main() async{
 
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  PushNotificationProvider pushNotificationProvider;
+  MainProvider _mainProvider;
+
+  @override
+  void initState() {
+
+    super.initState();
+
+    pushNotificationProvider = new PushNotificationProvider();
+
+    pushNotificationProvider.initNotifications();
+
+    pushNotificationProvider.bgStream.listen((event) {
+
+      final BuildContext currentContext = locator<NavigationService>().navigatorKey.currentContext;
+      _mainProvider = Provider.of<MainProvider>(currentContext, listen: false);
+      _mainProvider.drawerPage = 2;
+      Navigator.pushReplacementNamed(currentContext, 'orders');
+
+    });
+
+  }
+  @override
+  void dispose() {
+
+    pushNotificationProvider.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

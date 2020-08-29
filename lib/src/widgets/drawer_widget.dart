@@ -108,7 +108,7 @@ class DrawerMarket extends StatelessWidget {
                 if (_mainProvider.drawerPage == 2) return;
                 _mainProvider.drawerPage = 2;
                 _loginProvider.verifyLogin();
-                Navigator.pushReplacementNamed(context, 'cotizations');
+                Navigator.pushReplacementNamed(context, 'orders');
               },
             ),
             ListTile(

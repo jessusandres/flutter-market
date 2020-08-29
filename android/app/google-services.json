@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "311527735892",
+    "firebase_url": "https://flutter-market-rmp.firebaseio.com",
+    "project_id": "flutter-market-rmp",
+    "storage_bucket": "flutter-market-rmp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311527735892:android:f4237e28724625435863c1",
+        "android_client_info": {
+          "package_name": "com.tuquepides.gustolact.gustolact"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "311527735892-1dpi0ji45tl5g5gmrl2t0qtu053bmgp6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tuquepides.gustolact.gustolact",
+            "certificate_hash": "b724470009e5cff1387ec47303e32e0d9d883d4d"
+          }
+        },
+        {
+          "client_id": "311527735892-kjed4cbjg3jirhs5n4tqnaikb9dtqsmv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCi3HMyzItqFtqpt2KuIRf8T9UXWTq-drI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "311527735892-kjed4cbjg3jirhs5n4tqnaikb9dtqsmv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

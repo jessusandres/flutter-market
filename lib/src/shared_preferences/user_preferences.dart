@@ -55,6 +55,13 @@ class UserPreferences {
     this._preferences.setString("rm_userphone", phone);
   }
 
+  get bgMessage {
+    return this._preferences.get("bgmsg");
+  }
+  set bgMessage(bool msf) {
+    this._preferences.setBool("bgmsg", msf);
+  }
+
 
   get all => this._preferences.getKeys();
 

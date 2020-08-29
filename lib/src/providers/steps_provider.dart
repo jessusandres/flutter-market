@@ -522,6 +522,9 @@ class StepsProvider with ChangeNotifier {
   }
 
   Future<dynamic> generateQuotation() async {
+
+    this.applyPayment = true;
+
     final dptName = this
         ._allDepartamentsController
         .value
@@ -568,18 +571,18 @@ class StepsProvider with ChangeNotifier {
       HttpHeaders.authorizationHeader: "Bearer ${_userPreferences.authToken}"
     });
     final res = response.body;
-    print("status: ${response.statusCode}");
 
     final decoded = jsonDecode(res);
     this.applyPayment = false;
-    print(decoded);
+
+    this.applyPayment = false;
+
     if(response.statusCode == 201) {
       final quotationResponse = quotationPaymentResponseFromJson(res);
       return quotationResponse;
     }else {
       return decoded;
     }
-
 
   }
 

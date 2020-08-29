@@ -45,6 +45,7 @@ dependencies:
   skeleton_text: ^1.0.0
   flutter_culqi : ^0.5.2
   rxdart: ^0.24.1
+  firebase_messaging: ^7.0.0
 
 dev_dependencies:
   flutter_test:

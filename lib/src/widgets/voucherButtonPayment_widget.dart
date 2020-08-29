@@ -19,7 +19,7 @@ class VoucherButtonPayment extends StatelessWidget {
     return Container(
         child: RaisedButton(
           color: AppTheme.primaryColor,
-          onPressed: (enable) ? (){generateQuotation(stepsProvider, context);} :  null,
+          onPressed: (enable && !stepsProvider.applyPayment) ? (){generateQuotation(stepsProvider, context);} :  null,
           elevation: 0.0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
           child: Text(
