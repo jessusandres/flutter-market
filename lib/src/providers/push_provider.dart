@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:gustolact/src/providers/login_provider.dart';
 import 'package:gustolact/src/shared_preferences/user_preferences.dart';
 
 class PushNotificationProvider {
@@ -31,11 +32,13 @@ class PushNotificationProvider {
   }
 
   initNotifications() async {
-    await _firebaseMessaging.requestNotificationPermissions();
 
+    await _firebaseMessaging.requestNotificationPermissions();
     final token = await _firebaseMessaging.getToken();
+
     print("FCMT : ");
     print(token);
+    _userPreferences.fcmtToken = token;
 
     _firebaseMessaging.configure(
       onMessage: onMessage,
@@ -53,16 +56,14 @@ class PushNotificationProvider {
 
   Future<dynamic> onResume(Map<String, dynamic> message) async {
     print("on - resume");
-    final data = message['data'];
+//    final data = message['data'];
     _messagesStreamController.sink.add({
       "type": "resume",
-      "data": data
+      "data": message
     });
   }
 
   Future<dynamic> onLaunch(Map<String, dynamic> message) async {
-
-    _userPreferences.bgMessage = true;
 
     final data = message['data'];
     _bgSteamController.sink.add({

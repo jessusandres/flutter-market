@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/config/config.dart';
-import 'package:gustolact/src/models/culqipaymentresponse_model.dart';
+import 'package:gustolact/src/models/culqipayment_response_model.dart';
 import 'package:gustolact/src/models/departaments_model.dart';
 import 'package:gustolact/src/models/districts_model.dart';
 import 'package:gustolact/src/models/provinces_model.dart';

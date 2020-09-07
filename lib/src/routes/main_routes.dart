@@ -7,12 +7,10 @@ import 'package:gustolact/src/pages/filter_page.dart';
 import 'package:gustolact/src/pages/main_page.dart';
 
 final mainRoutes = {
-  '/': (BuildContext context) => Builder(builder: (BuildContext context) {
-    return MainPage(mainContext: context);
-  },),
-  'home': (BuildContext context) => HomeNavigator(),
-  'profile': (BuildContext context) => ProfilePage(),
-  'orders': (BuildContext context) => OrdersPage(),
-  'settings': (BuildContext context) => SharedPage(),
-  'filter': (BuildContext context) => FilterPage(),
+  '/': (_) => MainPage(),
+  'home': (_) => HomeNavigator(),
+  'profile': (_) => ProfilePage(),
+  'orders': (_) => OrdersPage(),
+  'shared': (_) => SharedPage(),
+  'filter': (_) => FilterPage(),
 };

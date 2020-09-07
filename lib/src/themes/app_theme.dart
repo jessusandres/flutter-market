@@ -19,6 +19,7 @@ class AppTheme {
       )
   );
   static EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 20, vertical: 10);
+  static const Color bgDrawer = Colors.white;
   static const Color notWhite = Color(0xFFEDF0F2);
   static const Color nearlyWhite = Color(0xFFFEFEFE);
   static const Color white = Color(0xFFFFFFFF);

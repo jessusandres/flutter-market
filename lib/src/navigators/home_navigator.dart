@@ -17,9 +17,9 @@ class _HomeNavigatorState extends State<HomeNavigator>
     with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: Color.fromRGBO(52, 54, 101, 0.0),
-        statusBarIconBrightness: Brightness.light));
+//    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+//        statusBarColor: Color.fromRGBO(52, 54, 101, 0.0),
+//        statusBarIconBrightness: Brightness.light));
 
     super.build(context);
 

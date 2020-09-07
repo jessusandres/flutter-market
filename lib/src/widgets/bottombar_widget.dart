@@ -105,7 +105,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
                 child: Icon(icon,
                     color: isEnable
                         ? LightColor.background
-                        : Theme.of(context).iconTheme.color),
+                        : AppTheme.lightTheme.iconTheme.color),
               )),
         ),
       ),

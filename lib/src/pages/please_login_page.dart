@@ -50,7 +50,7 @@ class PleaseLoginPage extends StatelessWidget {
                       height: size.height * 0.15,
 //                      width: size.width * 0.29,
                       child: Text(
-                        'INICIA SESIÓN PRIMERO',
+                        'INICIA SESIÓN',
                         style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: FontSize.xLarge.size - 2),
@@ -69,7 +69,7 @@ class PleaseLoginPage extends StatelessWidget {
                       },
                       child: Text(
                         'LOGUEARSE',
-                        style: TextStyle(color: AppTheme.white),
+                        style: TextStyle(color: AppTheme.white, fontSize: 13),
                       ),
                     )
                   ],

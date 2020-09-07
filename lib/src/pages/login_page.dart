@@ -35,11 +35,6 @@ class _LoginPageState extends State<LoginPage> {
       body: Stack(children: <Widget>[
         _fullBackground(context),
         _loginForm(context),
-        (loginProvider.loadingSign)
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Container()
       ]),
     );
   }
@@ -75,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _topContainer(Size size) {
     return Container(
-      padding: EdgeInsets.only(top: size.height * 0.09),
+      padding: EdgeInsets.only(top: size.height * 0.03),
       child: Column(
         children: <Widget>[
           Icon(Icons.person_pin_circle, size: 100.0, color: Colors.white),
@@ -108,6 +103,7 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 29.0),
       child: TextField(
+        enabled: !loginProvider.loadingSign,
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
             icon: Icon(
@@ -130,6 +126,8 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 29.0),
       child: TextField(
+        enabled: !loginProvider.loadingSign,
+        //TODO verificar longitud
 //        maxLength: 10,
         obscureText: !this._showPassword,
         decoration: InputDecoration(
@@ -149,9 +147,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             hintText: '********',
             labelText: 'Contraseña',
-//            counterText: snapshot.data,
             errorText: loginProvider.password.error),
-        // TODO call provider
         onChanged: (String value) {
           loginProvider.changePassword(value);
         },
@@ -172,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
         width: double.infinity,
         alignment: Alignment.center,
         child: Text(
-          'Ingresar',
+          !loginProvider.loadingSign ? 'Ingresar' : 'Iniciando Sesión...',
           style: TextStyle(fontSize: 17.0),
         ),
       ),
@@ -208,8 +204,6 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _loginForm(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
-//    final bloc = Provider.of(context);
     final LoginProvider loginProvider = Provider.of<LoginProvider>(context);
 
     return SingleChildScrollView(
@@ -221,46 +215,50 @@ class _LoginPageState extends State<LoginPage> {
               height: size.height * 0.28,
             ),
           ),
-          _fieldsContainer([
-            (widget.showBackbutton)
-                ? Container(
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryColor,
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                    ),
-                    width: 50,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: AppTheme.white,
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  )
-                : Container(),
-            (widget.showBackbutton) ? SizedBox(height: 15.0) : Container(),
-            Text(
-              'LOGIN',
+          Stack(
+            children: [
+              _fieldsContainer([
+//            (widget.showBackbutton)
+//                ? Container(
+//                    decoration: BoxDecoration(
+//                      color: AppTheme.primaryColor,
+//                      borderRadius: BorderRadius.all(Radius.circular(20)),
+//                    ),
+//                    width: 50,
+//                    child: IconButton(
+//                      icon: Icon(
+//                        Icons.arrow_back,
+//                        color: AppTheme.white,
+//                      ),
+//                      onPressed: () {
+//                        Navigator.pop(context);
+//                      },
+//                    ),
+//                  )
+//                : Container(),
+//            (widget.showBackbutton) ? SizedBox(height: 15.0) : Container(),
+                Text(
+                  'LOGIN',
 //                  style: TextStyle(fontSize: 20.0),
-              style: AppTheme.caption.copyWith(fontSize: 22),
-            ),
-            SizedBox(height: 30.0),
-            _emailField(loginProvider),
-            SizedBox(height: 30),
-            _passwordField(loginProvider),
-            SizedBox(height: 30),
-            Container(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: _buttonLogin(context))
-          ], size),
+                  style: AppTheme.caption.copyWith(fontSize: 21),
+                ),
+                SizedBox(height: 25.0),
+                _emailField(loginProvider),
+                SizedBox(height: 25),
+                _passwordField(loginProvider),
+                SizedBox(height: 25.0),
+                Container(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    child: _buttonLogin(context))
+              ], size),
+            ],
+          ),
           SizedBox(
             height: 15.0,
           ),
           Text('¿Olvidaste la contraseña?'),
           SizedBox(
-            height: 100.0,
+            height: 90.0,
           ),
         ],
       ),
@@ -270,7 +268,8 @@ class _LoginPageState extends State<LoginPage> {
   loginUser(LoginProvider loginProvider, BuildContext mcontext) async {
     final response = await loginProvider.loginUser();
     print(response);
-    if (!response['ok']) {
+
+    if (response == null || !response['ok']) {
       this._scaffoldKey.currentState.showSnackBar(SnackBar(
             content: Text(response['message']),
             action: SnackBarAction(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gustolact/src/config/config.dart';
-import 'package:gustolact/src/models/culqipaymentresponse_model.dart';
+import 'package:gustolact/src/models/culqipayment_response_model.dart';
 import 'package:gustolact/src/models/paymentItem.dart';
 import 'package:gustolact/src/models/quotation_response.dart';
 import 'package:gustolact/src/themes/app_theme.dart';

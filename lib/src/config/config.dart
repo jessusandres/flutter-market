@@ -16,7 +16,7 @@ String storeAvatar = 'https://www.redmovildenegocios.com/Mas7er/r3dmark3t/images
 String storeUrlAPI = 'https://tuquepides.com/api/store/$urlStore';
 // String storeUrlAPI = 'http://172.20.10.2:3000/store/$urlStore';
 
-// String baseUrlAPI = 'http://172.20.10.2:3000';
+//String baseUrlAPI = 'http://172.20.10.2:3000';
 String baseUrlAPI = 'https://tuquepides.com/api';
 
 String publicCulquiKey  = 'pk_test_9fb7c16dc0ed24f5';

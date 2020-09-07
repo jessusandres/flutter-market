@@ -55,11 +55,11 @@ class UserPreferences {
     this._preferences.setString("rm_userphone", phone);
   }
 
-  get bgMessage {
-    return this._preferences.get("bgmsg");
+  get fcmtToken {
+    return this._preferences.get("FCMT");
   }
-  set bgMessage(bool msf) {
-    this._preferences.setBool("bgmsg", msf);
+  set fcmtToken(String msf) {
+    this._preferences.setString("FCMT", msf);
   }
 
 

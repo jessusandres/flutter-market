@@ -6,14 +6,39 @@ import 'package:gustolact/src/config/config.dart';
 import 'package:gustolact/src/pages/login_page.dart';
 import 'package:gustolact/src/providers/login_provider.dart';
 import 'package:gustolact/src/providers/main_provider.dart';
+import 'package:gustolact/src/tansitions/slide_transition.dart';
 import 'package:gustolact/src/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class DrawerMarket extends StatelessWidget {
   @override
   Drawer build(BuildContext context) {
-    final MainProvider _mainProvider = Provider.of<MainProvider>(context);
+    final media = MediaQuery.of(context).size;
+
     final LoginProvider _loginProvider = Provider.of<LoginProvider>(context);
+
+    final tiles = [
+      {"title": "Inicio", "route": "/", "icon": Icons.home, "auth": false},
+      {
+        "title": "Perfil",
+        "route": "profile",
+        "icon": Icons.account_circle,
+        "auth": true
+      },
+      {
+        "title": "Mis Pedidos",
+        "route": "orders",
+        "icon": Icons.assessment,
+        "auth": true
+      },
+      {
+        "title": "Compartir",
+        "route": "shared",
+        "icon": Icons.share,
+        "auth": false
+      },
+    ];
+
     return Drawer(
       child: Container(
         child: Column(
@@ -27,164 +52,156 @@ class DrawerMarket extends StatelessWidget {
               height: 25,
             ),
             Container(
-              height: 210,
+              color: AppTheme.bgDrawer,
+              height: media.height * 0.3,
               width: double.infinity,
               child: FadeInImage(
-                placeholder: AssetImage('assets/gif/spinner.gif'),
-                image: NetworkImage(storeAvatar),
-                fit: BoxFit.cover,
-              ),
+                  fit: BoxFit.contain,
+                  placeholder: AssetImage('assets/gif/spinner.gif'),
+                  image: NetworkImage(storeAvatar)),
             ),
             Divider(),
-            ListTile(
-              leading: Icon(
-                Icons.home,
-                color: (_mainProvider.drawerPage == 0)
-                    ? AppTheme.primaryColor
-                    : Colors.black26,
-              ),
-              title: Text(
-                'Inicio',
-                style: TextStyle(
-                  color: (_mainProvider.drawerPage == 0)
-                      ? AppTheme.primaryColor
-                      : Colors.black26,
-                  fontWeight: (_mainProvider.drawerPage == 0)
-                      ? FontWeight.w700
-                      : FontWeight.normal,
-                ),
-              ),
-              onTap: () {
-                if (_mainProvider.drawerPage == 0) return;
-                _mainProvider.drawerPage = 0;
-                _loginProvider.verifyLogin();
-                Navigator.pushReplacementNamed(context, '/');
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.account_circle,
-                color: (_mainProvider.drawerPage == 1)
-                    ? Theme.of(context).primaryColor
-                    : Colors.black26,
-              ),
-              title: Text(
-                'Perfil',
-                style: TextStyle(
-                  color: (_mainProvider.drawerPage == 1)
-                      ? Theme.of(context).primaryColor
-                      : Colors.black26,
-                  fontWeight: (_mainProvider.drawerPage == 1)
-                      ? FontWeight.w700
-                      : FontWeight.normal,
-                ),
-              ),
-              onTap: () {
-                if (_mainProvider.drawerPage == 1) return;
-                _mainProvider.drawerPage = 1;
-                _loginProvider.verifyLogin();
-                Navigator.pushReplacementNamed(context, 'profile');
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.assessment,
-                color: (_mainProvider.drawerPage == 2)
-                    ? Theme.of(context).primaryColor
-                    : Colors.black26,
-              ),
-              title: Text(
-                'Mis Pedidos',
-                style: TextStyle(
-                  color: (_mainProvider.drawerPage == 2)
-                      ? Theme.of(context).primaryColor
-                      : Colors.black26,
-                  fontWeight: (_mainProvider.drawerPage == 2)
-                      ? FontWeight.w700
-                      : FontWeight.normal,
-                ),
-              ),
-              onTap: () {
-                if (_mainProvider.drawerPage == 2) return;
-                _mainProvider.drawerPage = 2;
-                _loginProvider.verifyLogin();
-                Navigator.pushReplacementNamed(context, 'orders');
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.share,
-                color: (_mainProvider.drawerPage == 3)
-                    ? Theme.of(context).primaryColor
-                    : Colors.black26,
-              ),
-              title: Text(
-                'Compartir',
-                style: TextStyle(
-                  color: (_mainProvider.drawerPage == 3)
-                      ? Theme.of(context).primaryColor
-                      : Colors.black26,
-                  fontWeight: (_mainProvider.drawerPage == 3)
-                      ? FontWeight.w700
-                      : FontWeight.normal,
-                ),
-              ),
-              onTap: () {
-                if (_mainProvider.drawerPage == 3) return;
-                _mainProvider.drawerPage = 3;
-                _loginProvider.verifyLogin();
-                Navigator.pushReplacementNamed(context, 'settings');
-              },
-            ),
             Expanded(
-              child: Container(),
+              child: ListView.builder(
+                physics: BouncingScrollPhysics(),
+                itemCount: tiles.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return DrawerItem(
+                      index: index,
+                      mcontext: context,
+                      auth: tiles[index]['auth'],
+                      icon: tiles[index]['icon'],
+                      route: tiles[index]['route'],
+                      title: tiles[index]['title']);
+                },
+              ),
             ),
             (_loginProvider.isLogged)
-                ? ListTile(
-                    trailing: Icon(
-                      FontAwesomeIcons.signOutAlt,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    title: Container(
-                      padding: EdgeInsets.only(left: 15),
-                      child: Text(
-                        'Cerrar Sesión',
-                        style: TextStyle(
-                            color: Colors.black26,
-                            fontWeight: FontWeight.w700,
-                            fontSize: FontSize.large.size),
-                      ),
-                    ),
-                    onTap: () {
-                      _loginProvider.logout();
-                    },
-                  )
-                : ListTile(
-                    trailing: Icon(
-                      FontAwesomeIcons.signOutAlt,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    title: Container(
-                      padding: EdgeInsets.only(left: 15),
-                      child: Text(
-                        'Iniciar Sesión',
-                        style: TextStyle(
-                            color: Colors.black26,
-                            fontWeight: FontWeight.w700,
-                            fontSize: FontSize.large.size),
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(context, CupertinoPageRoute(builder:(_)=>LoginPage()));
-                    },
-                  ),
+                ? LogoutTile(loginProvider: _loginProvider)
+                : LoginTile(),
             SizedBox(
-              height: 10,
+              height: 7,
             )
           ],
         ),
       ),
+    );
+  }
+}
+
+class LogoutTile extends StatelessWidget {
+  const LogoutTile({
+    Key key,
+    @required LoginProvider loginProvider,
+  })  : _loginProvider = loginProvider,
+        super(key: key);
+
+  final LoginProvider _loginProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      trailing: Icon(
+        FontAwesomeIcons.signOutAlt,
+        color: AppTheme.primaryColor,
+      ),
+      title: Container(
+        padding: EdgeInsets.only(left: 15),
+        child: Text(
+          'Cerrar Sesión',
+          style: TextStyle(
+              color: Colors.black26,
+              fontWeight: FontWeight.w700,
+              fontSize: FontSize.large.size),
+        ),
+      ),
+      onTap: () {
+        _loginProvider.logout();
+      },
+    );
+  }
+}
+
+class LoginTile extends StatelessWidget {
+  const LoginTile({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      trailing: Icon(
+        FontAwesomeIcons.signOutAlt,
+        color: AppTheme.primaryColor,
+      ),
+      title: Container(
+        padding: EdgeInsets.only(left: 15),
+        child: Text(
+          'Iniciar Sesión',
+          style: TextStyle(
+              color: Colors.black26,
+              fontWeight: FontWeight.w700,
+              fontSize: FontSize.large.size),
+        ),
+      ),
+      onTap: () {
+        Navigator.pop(context);
+        Navigator.push(
+            context, CupertinoPageRoute(builder: (_) => LoginPage()));
+      },
+    );
+  }
+}
+
+class DrawerItem extends StatelessWidget {
+  final int index;
+  final BuildContext mcontext;
+  final String title;
+  final String route;
+  final IconData icon;
+  final bool auth;
+
+  const DrawerItem(
+      {@required this.mcontext,
+      @required this.title,
+      @required this.index,
+      @required this.route,
+      @required this.icon,
+      @required this.auth});
+
+  @override
+  Widget build(BuildContext context) {
+    final MainProvider _mainProvider = Provider.of<MainProvider>(mcontext);
+    final LoginProvider _loginProvider = Provider.of<LoginProvider>(mcontext);
+
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: (_mainProvider.drawerPage == index)
+            ? AppTheme.primaryColor
+            : Colors.black26,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: (_mainProvider.drawerPage == index)
+              ? AppTheme.primaryColor
+              : Colors.black26,
+          fontWeight: (_mainProvider.drawerPage == index)
+              ? FontWeight.w700
+              : FontWeight.normal,
+        ),
+      ),
+      onTap: () {
+        if (_mainProvider.drawerPage == index) return;
+        if (auth && !_loginProvider.isLogged) {
+          Navigator.push(context, SlideLeftRoute(page: LoginPage()));
+          return;
+        }
+        _mainProvider.drawerPage = index;
+        _loginProvider.verifyLogin();
+        Navigator.pushReplacementNamed(context, '$route');
+      },
     );
   }
 }

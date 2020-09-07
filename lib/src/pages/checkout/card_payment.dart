@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_culqi/flutter_culqi.dart';
 import 'package:gustolact/src/config/config.dart';
-import 'package:gustolact/src/models/culqipaymentresponse_model.dart';
+import 'package:gustolact/src/models/culqipayment_response_model.dart';
 import 'package:gustolact/src/pages/checkout/payment_resume.dart';
 import 'package:gustolact/src/providers/steps_provider.dart';
 import 'package:gustolact/src/tansitions/fade_transition.dart';
